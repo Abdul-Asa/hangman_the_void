@@ -2,12 +2,21 @@ import { ColorModeScript } from '@chakra-ui/react';
 import React, { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
-import * as serviceWorker from './serviceWorker';
+import reportWebVitals from './tests/reportWebVitals';
+import * as serviceWorker from './tests/serviceWorker';
+import { extendTheme } from '@chakra-ui/react';
 
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
 
+const config = {
+  initialColorMode: 'light',
+  useSystemColorMode: false,
+};
+
+const theme = extendTheme({
+  config,
+});
 root.render(
   <StrictMode>
     <ColorModeScript />
