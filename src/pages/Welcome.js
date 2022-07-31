@@ -6,6 +6,7 @@ import ButtonDrop from '../components/Elements/ButtonDrop';
 import AnimatedHeading from '../components/Elements/AnimatedHeading';
 import ColorModeSwitcher from '../components/Elements/ColorModeSwitcher';
 import Drop from '../components/Animations/Drop';
+import SoundButton from '../components/Elements/SoundButton';
 function Welcome() {
   const hi = localStorage.getItem('highScores');
   if (!hi) {
@@ -16,9 +17,10 @@ function Welcome() {
     <>
       <Drop p={['8', '20']}>
         <ColorModeSwitcher />
+        <SoundButton />
       </Drop>
       <Center alignItems="center" pt={10}>
-        <Stack align={'center'}>
+        <Stack align={'center'} spacing={[20, 0]}>
           <WelcomeDiv>
             <AnimatedHeading fontSize={['22px', '36px']}>
               Welcome to The Void

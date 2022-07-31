@@ -105,7 +105,7 @@ const Menu = () => {
         transition="0.9s ease-out "
         onClick={() => navigate('/options/')}
       >
-        Help
+        Options
       </Button>{' '}
       <Button
         as={motion.button}

@@ -155,9 +155,12 @@ const Canvas = () => {
     <>
       <Drop p={['8', '20']} align="center">
         <BackButton />{' '}
-        <AnimatedHeading fontSize={'28px'}> Score: {score}</AnimatedHeading>
+        <AnimatedHeading fontSize={['20px', '28px']}>
+          {' '}
+          Score: {score}
+        </AnimatedHeading>
       </Drop>
-      <Center p={'8'} alignItems="center">
+      <Center p={8} alignItems="center">
         <Stack align={'center'}>
           <FadeIn color={useColorModeValue('brand.3', 'brand.4')}>
             <InputArea
@@ -168,7 +171,11 @@ const Canvas = () => {
           </FadeIn>
           <SlideUp>
             {' '}
-            <Text color={useColorModeValue('brand.3', 'brand.4')} pb={4}>
+            <Text
+              color={useColorModeValue('brand.3', 'brand.4')}
+              pb={4}
+              fontSize={['sm', 'medium']}
+            >
               Hint: {current.hint}
             </Text>
           </SlideUp>
