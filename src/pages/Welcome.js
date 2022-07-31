@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Center, Stack, useColorModeValue } from '@chakra-ui/react';
+import React from 'react';
+import { Center, Stack } from '@chakra-ui/react';
 
 import WelcomeDiv from '../components/Elements/WelcomeDiv';
 import ButtonDrop from '../components/Elements/ButtonDrop';

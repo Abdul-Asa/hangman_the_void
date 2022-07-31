@@ -1,17 +1,7 @@
 import React from 'react';
-import {
-  IconButton,
-  useColorMode,
-  useColorModeValue,
-  keyframes,
-} from '@chakra-ui/react';
+import { IconButton, useColorMode, useColorModeValue } from '@chakra-ui/react';
 import { FaVolumeUp, FaVolumeOff } from 'react-icons/fa';
-import {
-  motion,
-  AnimatePresence,
-  useMotionValue,
-  useTransform,
-} from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue } from 'framer-motion';
 
 // export const MyComponent = () => {
 //

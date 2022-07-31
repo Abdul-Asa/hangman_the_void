@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  Heading,
-  Center,
-  Stack,
-  Flex,
-  Box,
-  Button,
-  SimpleGrid,
-} from '@chakra-ui/react';
+import { Button, SimpleGrid } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 const Menu = () => {

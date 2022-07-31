@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-  Button,
-  Text,
-  Stack,
-  Input,
-  Fade,
-  Flex,
-  HStack,
-  SimpleGrid,
-  Box,
-} from '@chakra-ui/react';
+import { Input, HStack, Box } from '@chakra-ui/react';
 
 export const InputArea = ({ current, correct, ...props }) => {
   return (

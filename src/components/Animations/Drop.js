@@ -1,4 +1,4 @@
-import { Box, keyframes } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 
 function Drop({ children, ...props }) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heading, keyframes } from '@chakra-ui/react';
+import { Heading } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import './gradient.css';
 const AnimatedHeading = ({ children, ...props }) => {

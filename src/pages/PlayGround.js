@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { Stack, Link, useColorModeValue, OrderedList } from '@chakra-ui/react';
+import React from 'react';
+import { Stack, Link, useColorModeValue } from '@chakra-ui/react';
 import SlideUp from '../components/Animations/SlideUp';
 import WelcomeDiv from '../components/Elements/WelcomeDiv';
-import { motion } from 'framer-motion';
 import Drop from '../components/Animations/Drop';
 import AnimatedHeading from '../components/Elements/AnimatedHeading';
 import { BackButton } from '../components/Elements/BackButton';

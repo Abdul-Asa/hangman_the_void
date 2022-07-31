@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import theme from './Theme';
-import { ChakraProvider, Box, useColorModeValue, Flex } from '@chakra-ui/react';
+import { ChakraProvider, Box } from '@chakra-ui/react';
 // import { ColorModeSwitcher } from './component/ColorModeSwitcher';
 // import { Logo } from './Logo';
 
@@ -9,7 +9,6 @@ import { ChakraProvider, Box, useColorModeValue, Flex } from '@chakra-ui/react';
 import { BrowserRouter } from 'react-router-dom';
 import RoutesJs from './routes/RouteList';
 import { AnimatePresence } from 'framer-motion';
-import ColorModeSwitcher from './components/Elements/ColorModeSwitcher';
 function App() {
   // const [page, setPage] = useState(0);
   // const func1 = () => {
