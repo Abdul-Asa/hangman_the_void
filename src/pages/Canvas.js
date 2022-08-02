@@ -10,22 +10,44 @@ import {
   ModalHeader,
   useDisclosure,
   Link,
+  IconButton,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-
+import { FaArrowLeft } from 'react-icons/fa';
 import FadeIn from '../components/Animations/FadeIn';
 import SlideUp from '../components/Animations/SlideUp';
 import Drop from '../components/Animations/Drop';
 import AnimatedHeading from '../components/Elements/AnimatedHeading';
-import { BackButton } from '../components/Elements/BackButton';
-import { Answers } from '../components/Elements/Answers';
+import { Ideas } from '../components/Elements/Answers';
 import { TypeStage } from '../components/Elements/TypeArea';
 import { InputArea } from '../components/Elements/InputArea';
 import CountUp from 'react-countup';
+function shuffle(array) {
+  let currentIndex = array.length,
+    randomIndex;
+
+  // While there remain elements to shuffle.
+  while (currentIndex !== 0) {
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex],
+      array[currentIndex],
+    ];
+  }
+
+  return array;
+}
 
 const Canvas = () => {
+  const Answers = React.useMemo(() => {
+    return shuffle(Ideas);
+  }, []);
   const [level, setLevel] = useState(0);
   const [current, setCurrent] = useState(Answers[level]);
   const [complete, setComplete] = useState(false);
@@ -39,6 +61,7 @@ const Canvas = () => {
   const { onClose } = useDisclosure();
   const [done, setDone] = useState(false);
   const navigate = useNavigate();
+  const [uSure, setSure] = useState(false);
 
   const nextLevel = () => {
     setBegin(score);
@@ -64,8 +87,9 @@ const Canvas = () => {
       }
     });
     console.log(smallest, char);
-
-    hiScore[char] = score;
+    if (score > hiScore[char]) {
+      hiScore[char] = score;
+    }
     hiScore = hiScore.sort(function (a, b) {
       return b - a;
     });
@@ -125,10 +149,10 @@ const Canvas = () => {
     if (Answers[level]) {
       setCurrent(Answers[level]);
     }
-    console.log(level);
+    console.log(Answers, level);
 
     return () => {};
-  }, [level]);
+  }, [level, Answers]);
 
   useEffect(() => {
     setCorrect(Array(current.word.length).fill(false));
@@ -151,10 +175,114 @@ const Canvas = () => {
 
   return (
     <>
+      <Modal
+        closeOnOverlayClick={false}
+        isOpen={uSure}
+        onClose={onClose}
+        motionPreset="slideInBottom"
+      >
+        <ModalOverlay
+          bg="blackAlpha.300"
+          backdropFilter="blur(2px) hue-rotate(-15deg)"
+        />
+        <ModalContent
+          bgColor="white"
+          as={motion.div}
+          drag
+          dragConstraints={{
+            top: -10,
+            left: -50,
+            right: 50,
+            bottom: 10,
+          }}
+        >
+          <Stack p={2} align="center" h={'270px'} bgColor="white" rounded="md">
+            <>
+              <ModalHeader color={'black'}>
+                Are you sure you want to leave? 🥺
+              </ModalHeader>
+              <AnimatedHeading pb={4}>
+                {' '}
+                Final Score: <CountUp start={begin} end={score} />
+              </AnimatedHeading>
+              <Button
+                autoFocus={false}
+                as={motion.button}
+                alignItems="center"
+                color="white"
+                fontWeight="bold"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                borderRadius="md"
+                w="40%"
+                bgGradient="linear(to-r, brand.2, brand.1)"
+                _hover={{
+                  bgGradient: 'linear(to-r, red.500, yellow.500)',
+                }}
+                _focus={{
+                  bgGradient: 'linear(to-r, brand.2, brand.1)',
+                  bgClip: 'text',
+                  border: '1px solid black',
+                }}
+                onClick={() => {
+                  navigate(-1);
+                  setHigh();
+                }}
+              >
+                Yes, I don't care 😒
+              </Button>
+              <Button
+                as={motion.button}
+                alignItems="center"
+                color="white"
+                fontWeight="bold"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                borderRadius="md"
+                bgGradient="linear(to-r, brand.2, brand.1)"
+                _hover={{
+                  bgGradient: 'linear(to-r, red.500, yellow.500)',
+                }}
+                _focus={{
+                  bgGradient: 'linear(to-r, brand.2, brand.1)',
+                  bgClip: 'text',
+                  border: '1px solid black',
+                }}
+                onClick={() => {
+                  setSure(false);
+                }}
+              >
+                Fine 🙄, I'll stay for you senpai
+              </Button>
+            </>
+            {/*  */}
+          </Stack>
+        </ModalContent>
+      </Modal>
       <Drop p={['8', '20']} align="center">
-        <BackButton />{' '}
+        <IconButton
+          autoFocus={false}
+          bgGradient="linear(to-r, brand.2, brand.1)"
+          _hover={{
+            bgGradient: 'linear(to-r, red.500, yellow.500)',
+          }}
+          _focus={{
+            bg: 'transparent',
+            color: 'white',
+            border: '1px',
+          }}
+          size="sm"
+          fontSize="lg"
+          aria-label={`Go back`}
+          variant="ghost"
+          color="white"
+          marginLeft="2"
+          icon={<FaArrowLeft />}
+          onClick={() => {
+            setSure(true);
+          }}
+        />
         <AnimatedHeading fontSize={['20px', '28px']}>
-          {' '}
           Score: {score}
         </AnimatedHeading>
       </Drop>

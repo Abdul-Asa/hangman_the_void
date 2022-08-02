@@ -41,6 +41,7 @@ const HighScore = () => {
             {hiScores.map((number, index) => {
               return (
                 <ListItem
+                  key={index}
                   as={motion.li}
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{

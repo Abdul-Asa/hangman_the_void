@@ -1,7 +1,9 @@
-import React from 'react';
-import { IconButton, useColorMode, useColorModeValue } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { IconButton, useColorModeValue } from '@chakra-ui/react';
 import { FaVolumeUp, FaVolumeOff } from 'react-icons/fa';
 import { motion, AnimatePresence, useMotionValue } from 'framer-motion';
+// import useSound from 'use-sound';
+// import Xboxsfx from '../Sounds/Xbox.mp3';
 
 // export const MyComponent = () => {
 //
@@ -19,23 +21,20 @@ import { motion, AnimatePresence, useMotionValue } from 'framer-motion';
 // };
 
 const SoundButton = () => {
-  const { toggleColorMode } = useColorMode();
+  const [sound, setSound] = useState(true);
   const x = useMotionValue(0);
-
+  const toggleSound = () => {
+    setSound(!sound);
+  };
   return (
     <AnimatePresence exitBeforeEnter initial={false}>
       <motion.div
         style={{ display: 'inline-block' }}
-        key={useColorModeValue('light', 'dark')}
+        key={sound}
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 20, opacity: 0 }}
         transition={{ duration: 0.2 }}
-        onDragEnd={() => {
-          toggleColorMode();
-        }}
-
-        // onHoverStart={}
       >
         <IconButton
           as={motion.button}
@@ -53,9 +52,9 @@ const SoundButton = () => {
           whileTap={{ scale: 0.9 }}
           color={'white'}
           x={x}
-          aria-label="Toggle theme"
-          icon={useColorModeValue(<FaVolumeUp />, <FaVolumeOff />)}
-          onClick={toggleColorMode}
+          aria-label="Toggle sound"
+          icon={sound ? <FaVolumeUp /> : <FaVolumeOff />}
+          onClick={toggleSound}
         ></IconButton>
       </motion.div>
     </AnimatePresence>

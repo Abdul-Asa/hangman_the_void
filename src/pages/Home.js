@@ -16,6 +16,8 @@ import Suspension from '../components/Elements/Suspension';
 import FadeIn from '../components/Animations/FadeIn';
 import AnimatedHeading from '../components/Elements/AnimatedHeading';
 import SlideUp from '../components/Animations/SlideUp';
+// import useSound from 'use-sound';
+// import audio from '../components/Sounds/audio.mp3';
 function Home() {
   const user = JSON.parse(localStorage.getItem('userName'));
   const highScores = JSON.parse(localStorage.getItem('highScores'));
@@ -23,6 +25,8 @@ function Home() {
   const [minutes, setMinutes] = useState(new Date().getMinutes());
   var counter = 0;
   const navigate = useNavigate();
+  // const [play] = useSound(audio, { volume: '0.3', loop: true });
+  // const [playing, setPlaying] = useState(true);
 
   if (!user) {
     navigate('/');
@@ -30,7 +34,7 @@ function Home() {
   if (!highScores) {
     navigate('/');
   }
-
+  // play();
   useEffect(() => {
     const timer = setInterval(() => {
       setMinutes(new Date().getMinutes());
@@ -62,6 +66,7 @@ function Home() {
         </Flex>
       </Drop>
       <Center>
+        {/* {playing && play()} */}
         <Stack align={'center'}>
           <Flex align={'center'} direction={['column', 'column', 'row']}>
             <FadeIn>

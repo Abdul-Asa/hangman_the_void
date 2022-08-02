@@ -1,6 +1,6 @@
 .gradient {
 	background-size: 400% 400%;
-	animation: gradient 7s ease infinite;
+	animation: gradient 3s ease infinite;
 }
 
 @keyframes gradient {
