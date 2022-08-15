@@ -18,13 +18,21 @@ import '../components/Elements/cursor.css';
 import SlideUp from '../components/Animations/SlideUp';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import useSound from 'use-sound';
+import Click from '../components/Sounds/Click.mp3';
 
-const NameInput = () => {
+const NameInput = ({ sound }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [userName, setName] = useState('');
+  const [play] = useSound(Click, {
+    sprite: { 1: [700, 1000] },
+    interrupt: true,
+    soundEnabled: sound,
+  });
   const handleInput = e => {
     const { value } = e.target;
     setName(value);
+    play({ id: '1' });
     value.length > 2 ? onOpen() : onClose();
   };
   const navigate = useNavigate();
@@ -44,7 +52,7 @@ const NameInput = () => {
   return (
     <>
       <Drop p={['8', '20']}>
-        <BackButton />
+        <BackButton sound={sound} />
       </Drop>
       <Center p={'8'} alignItems="center">
         <Stack align={'center'}>

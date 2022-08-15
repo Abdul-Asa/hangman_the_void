@@ -25,8 +25,13 @@ function Home() {
   const [minutes, setMinutes] = useState(new Date().getMinutes());
   var counter = 0;
   const navigate = useNavigate();
-  // const [play] = useSound(audio, { volume: '0.3', loop: true });
-  // const [playing, setPlaying] = useState(true);
+
+  // const [playing, setPlaying] = useState(false);
+
+  // const [play, { stop, sound }] = useSound(audio, {
+  //   volume: '0.3',
+  //   loop: true,
+  // });
 
   if (!user) {
     navigate('/');
@@ -34,7 +39,7 @@ function Home() {
   if (!highScores) {
     navigate('/');
   }
-  // play();
+
   useEffect(() => {
     const timer = setInterval(() => {
       setMinutes(new Date().getMinutes());
@@ -48,7 +53,7 @@ function Home() {
   return (
     <>
       <Drop px={['8', '20']} pt={['8', '20']} pb={'8'} align="center">
-        <BackButton type="home" />
+        <BackButton type="home" sound />
         <Flex>
           <AnimatedHeading> {hours < 10 ? `0${hours}` : hours}</AnimatedHeading>
           <Box className="blink">
@@ -66,7 +71,6 @@ function Home() {
         </Flex>
       </Drop>
       <Center>
-        {/* {playing && play()} */}
         <Stack align={'center'}>
           <Flex align={'center'} direction={['column', 'column', 'row']}>
             <FadeIn>

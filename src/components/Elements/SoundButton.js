@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { IconButton, useColorModeValue } from '@chakra-ui/react';
 import { FaVolumeUp, FaVolumeOff } from 'react-icons/fa';
 import { motion, AnimatePresence, useMotionValue } from 'framer-motion';
@@ -20,11 +20,11 @@ import { motion, AnimatePresence, useMotionValue } from 'framer-motion';
 //   );
 // };
 
-const SoundButton = () => {
-  const [sound, setSound] = useState(true);
+const SoundButton = ({ sound, callback }) => {
+  // const [sound, setSound] = useState(true);
   const x = useMotionValue(0);
   const toggleSound = () => {
-    setSound(!sound);
+    callback();
   };
   return (
     <AnimatePresence exitBeforeEnter initial={false}>

@@ -2,10 +2,18 @@ import React from 'react';
 import { IconButton } from '@chakra-ui/react';
 import { FaArrowLeft, FaHome } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import useSound from 'use-sound';
+import bye from '../Sounds/Xp.mp3';
 
-export const BackButton = ({ ...props }) => {
+export const BackButton = ({ sound, ...props }) => {
+  // const sound = JSON.parse(localStorage.getItem('sound'));
+
   let navigate = useNavigate();
-
+  const [play] = useSound(bye, {
+    seek: 800,
+    interrupt: true,
+    soundEnabled: sound,
+  });
   return (
     <IconButton
       bgGradient="linear(to-r, brand.2, brand.1)"
@@ -27,9 +35,15 @@ export const BackButton = ({ ...props }) => {
       onClick={
         props.type
           ? () => {
+              if (props.sound) {
+                play();
+              }
               navigate('/');
             }
           : () => {
+              if (props.sound) {
+                play();
+              }
               navigate(-1);
             }
       }

@@ -2,6 +2,7 @@ import React from 'react';
 import { Center, Stack, Flex } from '@chakra-ui/react';
 // import useSound from 'use-sound';
 // import Xboxsfx from '../components/Sounds/Xbox.mp3';
+// import Clicksfx from '../components/Sounds/Click.mp3';
 import WelcomeDiv from '../components/Elements/WelcomeDiv';
 import ButtonDrop from '../components/Elements/ButtonDrop';
 import AnimatedHeading from '../components/Elements/AnimatedHeading';
@@ -9,15 +10,23 @@ import ColorModeSwitcher from '../components/Elements/ColorModeSwitcher';
 import Drop from '../components/Animations/Drop';
 import SoundButton from '../components/Elements/SoundButton';
 import HelpText from '../components/Elements/HelpText';
-function Welcome() {
+function Welcome({ sound, callback }) {
   // const [showing, setShowing] = useState(true);
   // const [play] = useSound(Xboxsfx, {
-  //   sprite: { pew: [3000, 3000] },
+  //   sprite: { pew: [3000, 4000] },
+  //   interrupt: true,
+  //   soundEnabled: true,
+  // });
+  // const [click] = useSound(Clicksfx, {
+  //   sprite: { c: [1000, 4000] },
   //   interrupt: true,
   //   soundEnabled: true,
   // });
   // const [played, setPlayed] = useState(false);
+
   const hi = localStorage.getItem('highScores');
+  // const si = localStorage.getItem('sound');
+
   if (!hi) {
     localStorage.setItem('highScores', JSON.stringify(Array(5).fill(0)));
   }
@@ -25,10 +34,10 @@ function Welcome() {
     <>
       <Drop p={['8', '20']}>
         <Flex align={'center'}>
-          <ColorModeSwitcher />
+          <ColorModeSwitcher sound={sound} />
           <HelpText />
         </Flex>
-        <SoundButton />
+        <SoundButton sound={sound} callback={callback} />
       </Drop>
       <Center
         alignItems="center"
@@ -45,7 +54,7 @@ function Welcome() {
               Welcome to The Void
             </AnimatedHeading>
           </WelcomeDiv>
-          <ButtonDrop />
+          <ButtonDrop sound={sound} />
         </Stack>
       </Center>
     </>

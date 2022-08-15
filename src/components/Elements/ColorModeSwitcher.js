@@ -1,7 +1,8 @@
 import { IconButton, useColorMode, useColorModeValue } from '@chakra-ui/react';
 import { SunIcon, MoonIcon } from '@chakra-ui/icons';
 import { motion, AnimatePresence, useMotionValue } from 'framer-motion';
-
+import useSound from 'use-sound';
+import stretch from '../Sounds/stretch.mp3';
 // export const MyComponent = () => {
 //
 //   return (
@@ -17,9 +18,14 @@ import { motion, AnimatePresence, useMotionValue } from 'framer-motion';
 //   );
 // };
 
-const ColorModeSwitcher = ({ menu }) => {
+const ColorModeSwitcher = ({ menu, sound }) => {
   const { toggleColorMode } = useColorMode();
   const x = useMotionValue(0);
+  const [play1, { stop }] = useSound(stretch, {
+    sprite: { pew: [500, 2000] },
+    interrupt: true,
+    soundEnabled: sound,
+  });
 
   return (
     <AnimatePresence exitBeforeEnter initial={false}>
@@ -34,7 +40,11 @@ const ColorModeSwitcher = ({ menu }) => {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 20, opacity: 0 }}
         transition={{ duration: 0.2 }}
+        onDragStart={() => {
+          play1({ id: 'pew' });
+        }}
         onDragEnd={() => {
+          stop();
           toggleColorMode();
         }}
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Welcome from '../pages/Welcome';
 import NameInput from '../pages/NameInput';
@@ -9,10 +9,22 @@ import PlayGround from '../pages/PlayGround';
 import Help from '../pages/Help';
 
 const RoutesJs = () => {
+  const [first, setfirst] = useState(true);
+  const callback = () => {
+    return setfirst(!first);
+  };
   return (
     <Routes>
-      <Route exact path="/" element={<Welcome />}></Route>
-      <Route exact path="/entry/*" element={<NameInput />}></Route>
+      <Route
+        exact
+        path="/"
+        element={<Welcome sound={first} callback={callback} />}
+      ></Route>
+      <Route
+        exact
+        path="/entry/*"
+        element={<NameInput sound={first} />}
+      ></Route>
       <Route exact path="/home/*" element={<Home />}></Route>
       <Route exact path="/canvas/*" element={<Canvas />}></Route>
       <Route exact path="/playground/*" element={<PlayGround />}></Route>

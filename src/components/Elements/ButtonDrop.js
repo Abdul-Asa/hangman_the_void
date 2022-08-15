@@ -3,15 +3,28 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import './click.css';
 import useSound from 'use-sound';
-import Xboxsfx from '../Sounds/Xbox.mp3';
+import yahBoy from '../Sounds/Yaboy.mp3';
+// import lesgo from '../Sounds/Lesgo.mp3';
 
-function ButtonDrop({ ...props }) {
+function ButtonDrop({ sound, ...props }) {
+  // const Sounds = {
+  //   1: yahBoy,
+  //   2: lesgo,
+  // };
+  // const sound = JSON.parse(localStorage.getItem('sound'));
+
   let navigate = useNavigate();
   const [isDesktop] = useMediaQuery('(min-width: 50em)');
-  const [play] = useSound(Xboxsfx, {
-    sprite: { pew: [3000, 3000] },
+  const [play1] = useSound(yahBoy, {
+    sprite: { pew: [900, 1300] },
     interrupt: true,
+    soundEnabled: sound,
   });
+  // const [play2] = useSound(lesgo, {
+  //   sprite: { pew: [1200, 1300] },
+  //   interrupt: true,
+  //   soundEnabled: true,
+  // });
   return isDesktop ? (
     <motion.button
       className="pushable"
@@ -20,6 +33,7 @@ function ButtonDrop({ ...props }) {
       initial={{ opacity: 0, scale: 0.5, width: '30%' }}
       animate={{ x: [150, 0], opacity: 1, scale: 1, width: '50%' }}
       onClick={() => {
+        play1({ id: 'pew' });
         navigate(`/entry/`);
       }}
     >
@@ -50,7 +64,7 @@ function ButtonDrop({ ...props }) {
         border: '1px',
       }}
       onClick={() => {
-        play({ id: 'pew' });
+        play1({ id: 'pew' });
         navigate(`/entry/`);
       }}
       {...props}
