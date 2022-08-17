@@ -17,7 +17,7 @@ import { w3cwebsocket as W3CWebSocket } from 'websocket';
 
 const PlayGround = () => {
   const user = JSON.parse(localStorage.getItem('userName'));
-  const client = new W3CWebSocket('ws://127.0.0.1:8000');
+  const client = new W3CWebSocket('https://websockets-five.vercel.app/');
   const [lobby, setLobby] = useState([]);
   // const [clientId] = useState();
 
