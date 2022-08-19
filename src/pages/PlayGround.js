@@ -19,12 +19,13 @@ import AnimatedHeading from '../components/Elements/AnimatedHeading';
 import { BackButton } from '../components/Elements/BackButton';
 import FadeIn from '../components/Animations/FadeIn';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const PlayGround = () => {
-  var HOST = location.origin.replace(/^http/, 'ws');
-  const user = JSON.parse(localStorage.getItem('userName'));
+  const HOST =
+    process.env.NODE_ENV === 'development' ? 'ws://127.0.0.1:8000' : '';
   const client = new W3CWebSocket(HOST);
+  const user = JSON.parse(localStorage.getItem('userName'));
   const [lobby, setLobby] = useState([]);
   const [userId, setId] = useState();
   const [opp, setOpp] = useState('');
