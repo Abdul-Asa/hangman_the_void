@@ -23,7 +23,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 const PlayGround = () => {
   const HOST =
-    process.env.NODE_ENV === 'development' ? 'ws://127.0.0.1:8000' : '';
+    process.env.NODE_ENV === 'development' ? 'wss://127.0.0.1:8000' : '';
   const client = new W3CWebSocket(HOST);
   const user = JSON.parse(localStorage.getItem('userName'));
   const [lobby, setLobby] = useState([]);
