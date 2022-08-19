@@ -22,8 +22,9 @@ import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import { useNavigate } from 'react-router-dom';
 
 const PlayGround = () => {
+  var HOST = location.origin.replace(/^http/, 'ws');
   const user = JSON.parse(localStorage.getItem('userName'));
-  const client = new W3CWebSocket('ws://hangman-websocket.herokuapp.com/');
+  const client = new W3CWebSocket(HOST);
   const [lobby, setLobby] = useState([]);
   const [userId, setId] = useState();
   const [opp, setOpp] = useState('');
