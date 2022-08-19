@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import useSound from 'use-sound';
 import bye from '../Sounds/Xp.mp3';
 
-export const BackButton = ({ sound, ...props }) => {
+export const BackButton = ({ sound, func, ...props }) => {
   // const sound = JSON.parse(localStorage.getItem('sound'));
 
   let navigate = useNavigate();
@@ -33,7 +33,12 @@ export const BackButton = ({ sound, ...props }) => {
       color="white"
       marginLeft="2"
       onClick={
-        props.type
+        func
+          ? () => {
+              func();
+              navigate(-1);
+            }
+          : props.type
           ? () => {
               if (props.sound) {
                 play();
