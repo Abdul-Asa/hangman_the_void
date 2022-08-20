@@ -159,7 +159,9 @@ const PlayGround = () => {
           >
             <>
               {message ? (
-                <Text>{message}</Text>
+                <Text fontWeight={'bold'} fontSize="20px">
+                  {message}
+                </Text>
               ) : (
                 <AnimatedHeading pb={4}>
                   Waiting for response...
@@ -253,9 +255,6 @@ const PlayGround = () => {
             );
           })}
         </Stack>
-        {/* <Button onClick={createGameFunc}>Create game</Button>
-        <Input />
-        <Button onClick={createGameFunc}>join game</Button> */}
         <SlideUp
           align={'center'}
           color={useColorModeValue('brand.3', 'brand.4')}
