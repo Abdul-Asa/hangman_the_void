@@ -74,7 +74,7 @@ const PlayGround = () => {
         // };
         // client.send(JSON.stringify(payLoad));
       }
-      if (results.method === 'lol loser') {
+      if (results.method === 'lol') {
         console.log(results);
         setMessage('Your request was rejected. Loser😝');
         setSure(true);
