@@ -5,6 +5,7 @@ import {
   useColorModeValue,
   Flex,
   Button,
+  Text,
   Modal,
   Spinner,
   ModalOverlay,
@@ -34,7 +35,8 @@ const PlayGround = () => {
   const { onClose } = useDisclosure();
   const [uSure, setSure] = useState(false);
   const [yay, setYay] = useState(false);
-  // const [match, setMatch] = useState(false);
+  const [match, setMatch] = useState(false);
+  const [message, setMessage] = useState('');
 
   let navigate = useNavigate();
 
@@ -62,6 +64,7 @@ const PlayGround = () => {
       }
       if (results.method === 'inviteGame') {
         console.log(results);
+        setSure(false);
         setYay(true);
         setOpp({ oppName: results.oppName, oppId: results.oppId });
         // const payLoad = {
@@ -70,6 +73,11 @@ const PlayGround = () => {
         //   userName: user,
         // };
         // client.send(JSON.stringify(payLoad));
+      }
+      if (results.method === 'lol loser') {
+        console.log(results);
+        setMessage('Your request was rejected. Loser😝');
+        setSure(true);
       }
     };
   }, []);
@@ -97,17 +105,28 @@ const PlayGround = () => {
     client.send(JSON.stringify(payLoad));
   };
 
-  // const acceptInvite = () => {
-  //   const payLoad = {
-  //     method: 'createGame',
-  //     clientId: userId,
-  //     clientName: user,
-  //     oppId: opp.oppId,
-  //     oppName: opp.oppName,
-  //   };
-  //   client.send(JSON.stringify(payLoad));
-  //   setMatch(true);
-  // };
+  const acceptInvite = () => {
+    const payLoad = {
+      method: 'createGame',
+      clientId: userId,
+      clientName: user,
+      oppId: opp.oppId,
+      oppName: opp.oppName,
+    };
+    client.send(JSON.stringify(payLoad));
+    setMatch(true);
+  };
+
+  const rejectInvite = () => {
+    const payLoad = {
+      method: 'rejected',
+      clientId: userId,
+      clientName: user,
+      oppId: opp.oppId,
+      oppName: opp.oppName,
+    };
+    client.send(JSON.stringify(payLoad));
+  };
   return (
     <>
       <Modal
@@ -131,10 +150,22 @@ const PlayGround = () => {
             bottom: 10,
           }}
         >
-          <Stack p={2} align="center" bgColor="white" rounded="md">
+          <Stack
+            p={2}
+            align="center"
+            bgColor="white"
+            color={'black'}
+            rounded="md"
+          >
             <>
-              <AnimatedHeading pb={4}>Waiting for response...</AnimatedHeading>
-              <Spinner color="black" />
+              {message ? (
+                <Text>{message}</Text>
+              ) : (
+                <AnimatedHeading pb={4}>
+                  Waiting for response...
+                </AnimatedHeading>
+              )}
+              {!message && <Spinner color="black" />}
               <Button
                 alignItems="center"
                 color="white"
@@ -150,11 +181,18 @@ const PlayGround = () => {
                   bgClip: 'text',
                   border: '1px solid black',
                 }}
-                onClick={() => {
-                  setSure(false);
-                  logOut();
-                  navigate(-1);
-                }}
+                onClick={
+                  message
+                    ? () => {
+                        setSure(false);
+                        setMessage('');
+                      }
+                    : () => {
+                        setSure(false);
+                        logOut();
+                        navigate(-1);
+                      }
+                }
               >
                 Cancel
               </Button>
@@ -221,7 +259,7 @@ const PlayGround = () => {
         <SlideUp
           align={'center'}
           color={useColorModeValue('brand.3', 'brand.4')}
-          pt={[350]}
+          py={'10%'}
           fontSize={['xs', 'sm']}
         >
           Made with ❤️ by {'\u00a0'}
@@ -285,7 +323,11 @@ const PlayGround = () => {
               borderRadius="md"
               w="40%"
               border={'1px solid black'}
-              onClick={() => setYay(false)}
+              onClick={() => {
+                setYay(false);
+                rejectInvite();
+              }}
+              mb="8px"
             >
               Decline
             </Button>
