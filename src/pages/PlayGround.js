@@ -19,11 +19,13 @@ import AnimatedHeading from '../components/Elements/AnimatedHeading';
 import { BackButton } from '../components/Elements/BackButton';
 import FadeIn from '../components/Animations/FadeIn';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const PlayGround = () => {
   const HOST =
-    process.env.NODE_ENV === 'development' ? 'wss://127.0.0.1:8000' : '';
+    process.env.NODE_ENV === 'development'
+      ? 'ws://127.0.0.1:8000'
+      : 'wss://hangman-websocket.herokuapp.com/';
   const client = new W3CWebSocket(HOST);
   const user = JSON.parse(localStorage.getItem('userName'));
   const [lobby, setLobby] = useState([]);
@@ -32,7 +34,7 @@ const PlayGround = () => {
   const { onClose } = useDisclosure();
   const [uSure, setSure] = useState(false);
   const [yay, setYay] = useState(false);
-  const [match, setMatch] = useState(false);
+  // const [match, setMatch] = useState(false);
 
   let navigate = useNavigate();
 
@@ -95,17 +97,17 @@ const PlayGround = () => {
     client.send(JSON.stringify(payLoad));
   };
 
-  const acceptInvite = () => {
-    const payLoad = {
-      method: 'createGame',
-      clientId: userId,
-      clientName: user,
-      oppId: opp.oppId,
-      oppName: opp.oppName,
-    };
-    client.send(JSON.stringify(payLoad));
-    setMatch(true);
-  };
+  // const acceptInvite = () => {
+  //   const payLoad = {
+  //     method: 'createGame',
+  //     clientId: userId,
+  //     clientName: user,
+  //     oppId: opp.oppId,
+  //     oppName: opp.oppName,
+  //   };
+  //   client.send(JSON.stringify(payLoad));
+  //   setMatch(true);
+  // };
   return (
     <>
       <Modal
