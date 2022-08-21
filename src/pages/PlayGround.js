@@ -72,7 +72,6 @@ const PlayGround = () => {
           };
           client.send(JSON.stringify(payLoad));
         } else {
-          console.log(results);
           setSure(false);
           setYay(true);
           setOpp({ oppName: results.oppName, oppId: results.oppId });
@@ -86,9 +85,11 @@ const PlayGround = () => {
       if (results.method === 'lol') {
         setSure(true);
         setMessage('Your request was rejected. Loser😝');
+        console.log(payLoad);
       }
       if (results.method === 'accepted') {
         setMatch(true);
+        console.log(payLoad);
       }
     };
     return () => {
