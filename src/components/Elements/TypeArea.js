@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, SimpleGrid, Stack, useMediaQuery } from '@chakra-ui/react';
 
-export const TypeStage = ({ func, ...props }) => {
+export const TypeStage = ({ func, disabled, ...props }) => {
   const alphabet = [
     'A',
     'B',
@@ -56,6 +56,7 @@ export const TypeStage = ({ func, ...props }) => {
               fontSize="l"
               color="white"
               marginLeft="2"
+              disabled={disabled}
               onClick={func}
               {...props}
             >
@@ -86,6 +87,7 @@ export const TypeStage = ({ func, ...props }) => {
               fontSize="l"
               color="white"
               marginLeft="2"
+              disabled={disabled}
               onClick={func}
             >
               {letter}
@@ -116,6 +118,7 @@ export const TypeStage = ({ func, ...props }) => {
               color="white"
               marginLeft="2"
               onClick={func}
+              disabled={disabled}
             >
               {letter}
             </Button>
@@ -148,6 +151,7 @@ export const TypeStage = ({ func, ...props }) => {
               color="white"
               marginLeft="2"
               onClick={func}
+              disabled={disabled}
               {...props}
             >
               {letter}
@@ -177,6 +181,7 @@ export const TypeStage = ({ func, ...props }) => {
               fontSize="l"
               color="white"
               marginLeft="2"
+              disabled={disabled}
               onClick={func}
             >
               {letter}
@@ -206,6 +211,7 @@ export const TypeStage = ({ func, ...props }) => {
               fontSize="l"
               color="white"
               marginLeft="2"
+              disabled={disabled}
               onClick={func}
             >
               {letter}

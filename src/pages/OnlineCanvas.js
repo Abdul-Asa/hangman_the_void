@@ -23,24 +23,6 @@ import { FaArrowLeft } from 'react-icons/fa';
 import { InputArea } from '../components/Elements/InputArea';
 import CountUp from 'react-countup';
 import Chat from '../components/Chat/Chat';
-function shuffle(array) {
-  let currentIndex = array.length,
-    randomIndex;
-  // While there remain elements to shuffle.
-  while (currentIndex !== 0) {
-    // Pick a remaining element.
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-
-    // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex],
-      array[currentIndex],
-    ];
-  }
-
-  return array;
-}
 
 const OnlineCanvas = ({
   callback,
@@ -384,7 +366,7 @@ const OnlineCanvas = ({
           {complete ? 'Complete 💖' : confam}
         </Text>
         <FadeIn>
-          <TypeStage func={check} />
+          <TypeStage func={check} disabled={!begin} />
         </FadeIn>
         <SlideUp
           align={'center'}

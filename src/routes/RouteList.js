@@ -7,7 +7,6 @@ import Canvas from '../pages/Canvas';
 import HighScore from '../pages/HighScore';
 import PlayGround from '../pages/PlayGround';
 import Help from '../pages/Help';
-import OnlineCanvas from '../pages/OnlineCanvas';
 
 const RoutesJs = () => {
   const [first, setfirst] = useState(true);

@@ -19,7 +19,7 @@ import AnimatedHeading from '../components/Elements/AnimatedHeading';
 import { BackButton } from '../components/Elements/BackButton';
 import FadeIn from '../components/Animations/FadeIn';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
-import { useNavigate, Routes, Route } from 'react-router-dom';
+// import { useNavigate, Routes, Route } from 'react-router-dom';
 import OnlineCanvas from './OnlineCanvas';
 
 const PlayGround = () => {
@@ -44,9 +44,7 @@ const PlayGround = () => {
   const [round, setRound] = useState(1);
   const [quit, setQuit] = useState(false);
   const [Answers, setAnswer] = useState();
-  let navigate = useNavigate();
-
-  let clientId = null;
+  // let navigate = useNavigate();
 
   useEffect(() => {
     client.onopen = () => {
@@ -55,11 +53,10 @@ const PlayGround = () => {
     client.onmessage = message => {
       const results = JSON.parse(message.data);
       if (results.method === 'connect') {
-        clientId = results.clientId;
-        setId(clientId);
+        setId(results.clientId);
         const payLoad = {
           method: 'connected',
-          clientId: clientId,
+          clientId: userId,
           userName: user,
         };
         client.send(JSON.stringify(payLoad));
@@ -112,7 +109,7 @@ const PlayGround = () => {
       }
     };
     return () => {};
-  }, []);
+  });
   const logOut = () => {
     const payLoad = {
       method: 'disconnected',
