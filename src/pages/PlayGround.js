@@ -38,7 +38,12 @@ const PlayGround = () => {
   const [match, setMatch] = useState(false);
   const [message, setMessage] = useState('');
   const [gameId, setGame] = useState();
-
+  const [score, setScore] = useState(0);
+  const [oppScores, setOppscores] = useState(0);
+  const [line, setLine] = useState(false);
+  const [round, setRound] = useState(1);
+  const [quit, setQuit] = useState(false);
+  const [Answers, setAnswer] = useState();
   let navigate = useNavigate();
 
   let clientId = null;
@@ -76,25 +81,37 @@ const PlayGround = () => {
           setYay(true);
           setOpp({ oppName: results.oppName, oppId: results.oppId });
           setGame(results.gameId);
+          setAnswer(results.questions);
         }
       }
       if (results.method === 'inv') {
         console.log(results);
+        setOpp({ oppName: results.oppName, oppId: results.oppId });
         setGame(results.gameId);
+        setAnswer(results.questions);
       }
       if (results.method === 'lol') {
         setSure(true);
         setMessage('Your request was rejected. Loser😝');
+        setOpp('');
+        setGame('');
         console.log(results);
       }
       if (results.method === 'accepted') {
+        setSure(false);
         setMatch(true);
-        console.log(results);
+      }
+      if (results.method === 'play') {
+        setOppscores(results.oppScores);
+        setLine(true);
+      }
+      if (results.method === 'endMatch') {
+        setQuit(true);
+        setOpp('');
+        setGame('');
       }
     };
-    return () => {
-      client.close();
-    };
+    return () => {};
   }, []);
   const logOut = () => {
     const payLoad = {
@@ -108,6 +125,7 @@ const PlayGround = () => {
   };
   const startGame = e => {
     const { value, name } = e.target;
+
     const payLoad = {
       method: 'createGame',
       clientId: userId,
@@ -140,8 +158,35 @@ const PlayGround = () => {
     client.send(JSON.stringify(payLoad));
     console.log(payLoad);
   };
+
+  const updateGameState = () => {
+    const payLoad = {
+      method: 'play',
+      clientId: userId,
+      clientName: user,
+      oppId: opp.oppId,
+      oppName: opp.oppName,
+      gameId: gameId,
+      score: score,
+      round: round,
+    };
+    client.send(JSON.stringify(payLoad));
+    setRound(round + 1);
+  };
+  const endMatch = () => {
+    const payLoad = {
+      method: 'endMatch',
+      clientId: userId,
+      clientName: user,
+      oppId: opp.oppId,
+      oppName: opp.oppName,
+      gameId: gameId,
+    };
+    client.send(JSON.stringify(payLoad));
+  };
   const callback = () => {
     setMatch(false);
+    endMatch();
   };
   return !match ? (
     <>
@@ -345,13 +390,79 @@ const PlayGround = () => {
       </Modal>
     </>
   ) : (
-    <OnlineCanvas
-      callback={callback}
-      client={client}
-      userId={userId}
-      opp={opp}
-      gameId={gameId}
-    />
+    <>
+      <OnlineCanvas
+        callback={callback}
+        userId={userId}
+        opp={opp}
+        gameId={gameId}
+        updateGame={updateGameState}
+        score={score}
+        setScore={setScore}
+        oppScores={oppScores}
+        line={line}
+        setLine={setLine}
+        Answers={Answers}
+      />{' '}
+      <Modal
+        closeOnOverlayClick={false}
+        isOpen={quit}
+        onClose={onClose}
+        motionPreset="slideInBottom"
+      >
+        <ModalOverlay
+          bg="blackAlpha.300"
+          backdropFilter="blur(2px) hue-rotate(-15deg)"
+        />
+        <ModalContent
+          bgColor="white"
+          as={motion.div}
+          drag
+          dragConstraints={{
+            top: -10,
+            left: -50,
+            right: 50,
+            bottom: 10,
+          }}
+        >
+          <Stack
+            p={2}
+            align="center"
+            bgColor="white"
+            color={'black'}
+            rounded="md"
+          >
+            <>
+              <AnimatedHeading pb={4}>Opponent quit</AnimatedHeading>
+              <Button
+                alignItems="center"
+                color="white"
+                fontWeight="bold"
+                borderRadius="md"
+                w="40%"
+                bgGradient="linear(to-r, brand.2, brand.1)"
+                _hover={{
+                  bgGradient: 'linear(to-r, red.500, yellow.500)',
+                }}
+                _focus={{
+                  bgGradient: 'linear(to-r, brand.2, brand.1)',
+                  bgClip: 'text',
+                  border: '1px solid black',
+                }}
+                onClick={() => {
+                  setSure(false);
+                  setMessage('');
+                  setMatch(false);
+                  setQuit(false);
+                }}
+              >
+                Back to Menu
+              </Button>
+            </>
+          </Stack>
+        </ModalContent>
+      </Modal>{' '}
+    </>
   );
 };
 
