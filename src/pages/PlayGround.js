@@ -85,11 +85,11 @@ const PlayGround = () => {
       if (results.method === 'lol') {
         setSure(true);
         setMessage('Your request was rejected. Loser😝');
-        console.log(payLoad);
+        console.log(results);
       }
       if (results.method === 'accepted') {
         setMatch(true);
-        console.log(payLoad);
+        console.log(results);
       }
     };
     return () => {
@@ -115,7 +115,6 @@ const PlayGround = () => {
       oppId: value,
       oppName: name,
     };
-    console.log(payLoad);
     client.send(JSON.stringify(payLoad));
   };
   const acceptInvite = () => {
