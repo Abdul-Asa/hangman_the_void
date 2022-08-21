@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Stack,
   Link,
-  useColorModeValue,
   Flex,
   Button,
   Text,
@@ -20,7 +19,8 @@ import AnimatedHeading from '../components/Elements/AnimatedHeading';
 import { BackButton } from '../components/Elements/BackButton';
 import FadeIn from '../components/Animations/FadeIn';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Routes, Route } from 'react-router-dom';
+import OnlineCanvas from './OnlineCanvas';
 
 const PlayGround = () => {
   const HOST =
@@ -37,6 +37,7 @@ const PlayGround = () => {
   const [yay, setYay] = useState(false);
   const [match, setMatch] = useState(false);
   const [message, setMessage] = useState('');
+  const [gameId, setGame] = useState();
 
   let navigate = useNavigate();
 
@@ -63,22 +64,35 @@ const PlayGround = () => {
         setLobby(results.lobby);
       }
       if (results.method === 'inviteGame') {
+        if (gameId) {
+          const payLoad = {
+            method: 'inaMatch',
+            clientId: userId,
+            clientName: user,
+          };
+          client.send(JSON.stringify(payLoad));
+        } else {
+          console.log(results);
+          setSure(false);
+          setYay(true);
+          setOpp({ oppName: results.oppName, oppId: results.oppId });
+          setGame(results.gameId);
+        }
+      }
+      if (results.method === 'inv') {
         console.log(results);
-        setSure(false);
-        setYay(true);
-        setOpp({ oppName: results.oppName, oppId: results.oppId });
-        // const payLoad = {
-        //   method: 'connected',
-        //   oppName: results,
-        //   userName: user,
-        // };
-        // client.send(JSON.stringify(payLoad));
+        setGame(results.gameId);
       }
       if (results.method === 'lol') {
-        console.log(results);
-        setMessage('Your request was rejected. Loser😝');
         setSure(true);
+        setMessage('Your request was rejected. Loser😝');
       }
+      if (results.method === 'accepted') {
+        setMatch(true);
+      }
+    };
+    return () => {
+      client.close();
     };
   }, []);
   const logOut = () => {
@@ -91,7 +105,6 @@ const PlayGround = () => {
     console.log('Disconnected');
     client.close();
   };
-
   const startGame = e => {
     const { value, name } = e.target;
     const payLoad = {
@@ -104,19 +117,17 @@ const PlayGround = () => {
     console.log(payLoad);
     client.send(JSON.stringify(payLoad));
   };
-
   const acceptInvite = () => {
     const payLoad = {
-      method: 'createGame',
+      method: 'accepted',
       clientId: userId,
       clientName: user,
       oppId: opp.oppId,
       oppName: opp.oppName,
+      gameId: gameId,
     };
     client.send(JSON.stringify(payLoad));
-    setMatch(true);
   };
-
   const rejectInvite = () => {
     const payLoad = {
       method: 'rejected',
@@ -124,10 +135,15 @@ const PlayGround = () => {
       clientName: user,
       oppId: opp.oppId,
       oppName: opp.oppName,
+      gameId: gameId,
     };
     client.send(JSON.stringify(payLoad));
+    console.log(payLoad);
   };
-  return (
+  const callback = () => {
+    setMatch(false);
+  };
+  return !match ? (
     <>
       <Modal
         closeOnOverlayClick={false}
@@ -188,11 +204,10 @@ const PlayGround = () => {
                     ? () => {
                         setSure(false);
                         setMessage('');
+                        setGame('');
                       }
                     : () => {
                         setSure(false);
-                        logOut();
-                        navigate(-1);
                       }
                 }
               >
@@ -217,13 +232,7 @@ const PlayGround = () => {
             Players Online:
           </AnimatedHeading>
         </FadeIn>{' '}
-        <Stack
-          spacing={'10'}
-          w={['80%', '40%']}
-          pt={[10, 0]}
-          color={useColorModeValue('brand.3', 'brand.4')}
-          overflow="hidden"
-        >
+        <Stack spacing={'10'} w={['80%', '40%']} pt={[10, 0]} overflow="hidden">
           {lobby.map((player, index) => {
             return (
               <Flex
@@ -255,12 +264,7 @@ const PlayGround = () => {
             );
           })}
         </Stack>
-        <SlideUp
-          align={'center'}
-          color={useColorModeValue('brand.3', 'brand.4')}
-          py={'10%'}
-          fontSize={['xs', 'sm']}
-        >
+        <SlideUp align={'center'} py={'10%'} fontSize={['xs', 'sm']}>
           Made with ❤️ by {'\u00a0'}
           <Link href="https://twitter.com/AbdullahShehu1" target={'_blank'}>
             Shehu
@@ -314,6 +318,11 @@ const PlayGround = () => {
                 bgClip: 'text',
                 border: '1px solid black',
               }}
+              onClick={() => {
+                setYay(false);
+                acceptInvite();
+                setMatch(true);
+              }}
             >
               Accept
             </Button>
@@ -325,6 +334,7 @@ const PlayGround = () => {
               onClick={() => {
                 setYay(false);
                 rejectInvite();
+                setGame('');
               }}
               mb="8px"
             >
@@ -334,6 +344,14 @@ const PlayGround = () => {
         </ModalContent>
       </Modal>
     </>
+  ) : (
+    <OnlineCanvas
+      callback={callback}
+      client={client}
+      userId={userId}
+      opp={opp}
+      gameId={gameId}
+    />
   );
 };
 

@@ -40,4 +40,5 @@ function shuffle(array) {
 
   return array;
 }
+
 export const Ideas = shuffle(wow);

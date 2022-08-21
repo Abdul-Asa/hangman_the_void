@@ -305,7 +305,6 @@ const Canvas = () => {
               Hint: {current.hint}
             </Text>
           </SlideUp>
-
           <Text
             borderColor={useColorModeValue('brand.3', 'brand.4')}
             pb={`10`}

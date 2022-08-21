@@ -7,6 +7,7 @@ import Canvas from '../pages/Canvas';
 import HighScore from '../pages/HighScore';
 import PlayGround from '../pages/PlayGround';
 import Help from '../pages/Help';
+import OnlineCanvas from '../pages/OnlineCanvas';
 
 const RoutesJs = () => {
   const [first, setfirst] = useState(true);
@@ -27,7 +28,7 @@ const RoutesJs = () => {
       ></Route>
       <Route exact path="/home/*" element={<Home />}></Route>
       <Route exact path="/canvas/*" element={<Canvas />}></Route>
-      <Route exact path="/playground/*" element={<PlayGround />}></Route>
+      <Route exact path="/playground/" element={<PlayGround />}></Route>
       <Route exact path="/options/*" element={<Help />}></Route>
       <Route exact path="/hi-scores/*" element={<HighScore />}></Route>
     </Routes>
