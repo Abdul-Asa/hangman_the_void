@@ -51,7 +51,7 @@ const OnlineCanvas = ({
   const [confam, setConfam] = useState('');
   const [start, setStart] = useState(false);
   const [count, setCount] = useState(7);
-  const [timer, setTimer] = useState(5);
+  const [timer, setTimer] = useState(15);
   const [leave, setLeave] = useState(false);
   const [finished, setFinished] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -92,7 +92,7 @@ const OnlineCanvas = ({
           setLevel(level + 1);
           nextLevel();
           setCount(7);
-          setTimer(5);
+          setTimer(15);
           setStart(false);
           setLine(false);
         }, 5000);
