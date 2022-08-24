@@ -7,6 +7,8 @@ import {
   useDisclosure,
   Modal,
   ModalHeader,
+  ModalFooter,
+  ModalBody,
   Button,
   ModalOverlay,
   ModalContent,
@@ -14,7 +16,6 @@ import {
   Flex,
 } from '@chakra-ui/react';
 import SlideUp from '../components/Animations/SlideUp';
-import { motion } from 'framer-motion';
 import Drop from '../components/Animations/Drop';
 import AnimatedHeading from '../components/Elements/AnimatedHeading';
 import FadeIn from '../components/Animations/FadeIn';
@@ -22,10 +23,12 @@ import { TypeStage } from '../components/Elements/TypeArea';
 import { FaArrowLeft } from 'react-icons/fa';
 import { InputArea } from '../components/Elements/InputArea';
 import CountUp from 'react-countup';
-import Chat from '../components/Chat/Chat';
+// import Chat from '../components/Chat/Chat';
+// import { Ideas } from '../components/Elements/Answers';
+import { useNavigate } from 'react-router-dom';
 
 const OnlineCanvas = ({
-  callback,
+  leaveMatch,
   opp,
   score,
   oppScores,
@@ -33,25 +36,26 @@ const OnlineCanvas = ({
   setScore,
   line,
   setLine,
-  Answers,
+  questions,
+  setMatch,
 }) => {
+  const Answers = React.useMemo(() => {
+    return questions;
+  }, []);
   const [level, setLevel] = useState(0);
-  const [current, setCurrent] = useState(Answers.Ideas[level]);
+  const [current, setCurrent] = useState(Answers[level]);
   const [complete, setComplete] = useState(false);
   const [correct, setCorrect] = useState(
     Array(current.word.length).fill(false)
   );
   const [confam, setConfam] = useState('');
   const [start, setStart] = useState(false);
-  const [begin, setBegin] = useState(0);
-  // const [lose, setLose] = useState(false);
-  const { onClose } = useDisclosure();
-  const [done, setDone] = useState(false);
-  const [uSure, setSure] = useState(false);
   const [count, setCount] = useState(7);
-  const [timer, setTimer] = useState(20);
-  const [modal, setModal] = useState(false);
-  const [watch, setWatch] = useState(4);
+  const [timer, setTimer] = useState(5);
+  const [leave, setLeave] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate();
 
   const user = JSON.parse(localStorage.getItem('userName'));
 
@@ -65,28 +69,6 @@ const OnlineCanvas = ({
     }
     return () => clearInterval(interval);
   }, [count]);
-
-  useEffect(() => {
-    if (line === true) {
-      const interval = setInterval(() => {
-        setWatch(watch - 1);
-      }, 1000);
-      if (watch === 0) {
-        nextLevel();
-        setCount(7);
-        setSure(false);
-        setTimer(20);
-        setStart(false);
-        clearInterval(interval);
-        setLine(false);
-        setWatch(4);
-      }
-      return () => clearInterval(interval);
-    }
-
-    return () => {};
-  }, [watch, line]);
-
   useEffect(() => {
     if (start) {
       const interval = setInterval(() => {
@@ -95,23 +77,38 @@ const OnlineCanvas = ({
       if (timer === 0) {
         updateGame();
         clearInterval(interval);
-        setSure(true);
+        onOpen();
       }
       return () => clearInterval(interval);
     }
   }, [timer, start]);
 
+  useEffect(() => {
+    if (line === true) {
+      if (level === 4) {
+        setFinished(true);
+      } else {
+        setTimeout(() => {
+          setLevel(level + 1);
+          nextLevel();
+          setCount(7);
+          setTimer(5);
+          setStart(false);
+          setLine(false);
+        }, 5000);
+      }
+    }
+  }, [line]);
+
   const nextLevel = () => {
-    setBegin(score);
     onClose();
     setComplete(false);
-    if (level < Answers.Ideas.length - 1) {
+    if (level < Answers.length - 1) {
       setLevel(level + 1);
-    } else {
-      setDone(true);
     }
     setConfam('');
   };
+
   const check = e => {
     const { value } = e.target;
     for (let x = 0; x < current.word.length; x++) {
@@ -157,8 +154,8 @@ const OnlineCanvas = ({
   };
 
   useEffect(() => {
-    if (Answers.Ideas[level]) {
-      setCurrent(Answers.Ideas[level]);
+    if (Answers[level]) {
+      setCurrent(Answers[level]);
     }
     return () => {};
   }, [level, Answers]);
@@ -166,7 +163,7 @@ const OnlineCanvas = ({
   useEffect(() => {
     setCorrect(Array(current.word.length).fill(false));
     return () => {};
-  }, [current.word.length]);
+  }, [current]);
 
   useEffect(() => {
     if (!correct.includes(false)) {
@@ -202,134 +199,10 @@ const OnlineCanvas = ({
 
   return (
     <>
-      <Modal
-        closeOnOverlayClick={false}
-        isOpen={uSure}
-        onClose={onClose}
-        motionPreset="slideInBottom"
-        scrollBehavior={'inside'}
-      >
-        <ModalOverlay
-          bg="blackAlpha.300"
-          backdropFilter="blur(2px) hue-rotate(-15deg)"
-        />
-        <ModalContent
-          maxH={'500px'}
-          bgColor="white"
-          overflow={'auto'}
-          overflowY="auto"
-          as={motion.div}
-          drag
-          dragConstraints={{
-            top: -10,
-            left: -50,
-            right: 50,
-            bottom: 10,
-          }}
-        >
-          {done ? (
-            <>
-              <Chat />
-              <Flex p="5%" justify={'space-around'}>
-                <Button
-                  as={motion.button}
-                  alignItems="center"
-                  color="white"
-                  fontWeight="bold"
-                  borderRadius="md"
-                  w="40%"
-                  bgGradient="linear(to-r, brand.2, brand.1)"
-                  _hover={{
-                    bgGradient: 'linear(to-r, red.500, yellow.500)',
-                  }}
-                  _focus={{
-                    bgGradient: 'linear(to-r, brand.2, brand.1)',
-                    bgClip: 'text',
-                    border: '1px solid black',
-                  }}
-                  onClick={() => {
-                    setSure(false);
-                    nextLevel();
-                    setTimer(20);
-                    setCount(7);
-                    setStart(false);
-                  }}
-                >
-                  Rematch
-                </Button>
-                <Button
-                  as={motion.button}
-                  alignItems="center"
-                  color="white"
-                  fontWeight="bold"
-                  borderRadius="md"
-                  w="40%"
-                  bgGradient="linear(to-r, brand.2, brand.1)"
-                  _hover={{
-                    bgGradient: 'linear(to-r, red.500, yellow.500)',
-                  }}
-                  _focus={{
-                    bgGradient: 'linear(to-r, brand.2, brand.1)',
-                    bgClip: 'text',
-                    border: '1px solid black',
-                  }}
-                  onClick={() => {
-                    setSure(false);
-                    setDone(false);
-                  }}
-                >
-                  Quit
-                </Button>
-              </Flex>
-            </>
-          ) : (
-            <Stack
-              p={2}
-              align="center"
-              h={'270px'}
-              bgColor="white"
-              rounded="md"
-              overscroll={'contain'}
-            >
-              <ModalHeader color={'black'}>
-                Round {level + 1} complete! 🎉
-              </ModalHeader>
-              <AnimatedHeading pb={4}>
-                Your Score: <CountUp start={begin} end={score} />
-              </AnimatedHeading>
-              <AnimatedHeading pb={4}>
-                {opp.oppName}'s Score: <CountUp start={begin} end={oppScores} />
-              </AnimatedHeading>
-
-              <Button
-                autoFocus={false}
-                as={motion.button}
-                alignItems="center"
-                color="white"
-                fontWeight="bold"
-                borderRadius="md"
-                w="40%"
-                bgGradient="linear(to-r, brand.2, brand.1)"
-                _hover={{
-                  bgGradient: 'linear(to-r, red.500, yellow.500)',
-                }}
-                _focus={{
-                  bgGradient: 'linear(to-r, brand.2, brand.1)',
-                  bgClip: 'text',
-                  border: '1px solid black',
-                }}
-                isLoading={!line}
-              >
-                {watch}
-              </Button>
-            </Stack>
-          )}
-        </ModalContent>
-      </Modal>
       <Drop p={['8', '20']} align="center">
-        <ReturnButton onClick={() => setModal(true)} />
+        <ReturnButton onClick={() => setLeave(true)} />
         <AnimatedHeading fontSize={['14px', '28px']}>
-          {user} vs {opp.oppName}
+          {user} vs {opp.userName}
         </AnimatedHeading>
         <AnimatedHeading fontSize={['14px', '28px']}>
           Score: {score}
@@ -347,7 +220,6 @@ const OnlineCanvas = ({
           />
         </FadeIn>
         <SlideUp>
-          {' '}
           <Text
             color={useColorModeValue('brand.3', 'brand.4')}
             pb={4}
@@ -366,7 +238,7 @@ const OnlineCanvas = ({
           {complete ? 'Complete 💖' : confam}
         </Text>
         <FadeIn>
-          <TypeStage func={check} disabled={!begin} />
+          <TypeStage func={check} disabled={!start} />
         </FadeIn>
         <SlideUp
           align={'center'}
@@ -380,92 +252,123 @@ const OnlineCanvas = ({
           </Link>
         </SlideUp>
       </Stack>
-      <Modal
-        closeOnOverlayClick={false}
-        isOpen={modal}
-        onClose={onClose}
-        motionPreset="slideInBottom"
-        scrollBehavior={'inside'}
-      >
-        <ModalOverlay
-          bg="blackAlpha.300"
-          backdropFilter="blur(2px) hue-rotate(-15deg)"
-        />
-        <ModalContent
-          maxH={'500px'}
-          bgColor="white"
-          overflow={'auto'}
-          overflowY="auto"
-          as={motion.div}
-          drag
-          dragConstraints={{
-            top: -10,
-            left: -50,
-            right: 50,
-            bottom: 10,
-          }}
-        >
-          <Stack
-            p={2}
-            align="center"
-            h={'270px'}
-            bgColor="white"
-            rounded="md"
-            overscroll={'contain'}
-          >
-            <ModalHeader color={'black'}>
-              Are you sure you want to quit?{' '}
+      <>
+        <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false}>
+          <ModalOverlay />
+          <ModalContent alignItems={'center'}>
+            <ModalHeader>
+              <Flex>
+                <AnimatedHeading
+                  bgGradient="linear(to-r, red.500, yellow.500)"
+                  fontSize={['16px', '26px']}
+                  pr="5px"
+                >
+                  Round {level + 1} complete
+                </AnimatedHeading>
+                🎉
+              </Flex>
             </ModalHeader>
+            <ModalBody>
+              {' '}
+              <AnimatedHeading pb={4}>
+                Your Score: <CountUp start={0} end={score} />
+              </AnimatedHeading>
+              <AnimatedHeading pb={4}>
+                {opp.userName}'s Score: <CountUp start={0} end={oppScores} />
+              </AnimatedHeading>
+            </ModalBody>
 
-            <Button
-              autoFocus={false}
-              as={motion.button}
-              alignItems="center"
-              color="white"
-              fontWeight="bold"
-              borderRadius="md"
-              w="40%"
-              bgGradient="linear(to-r, brand.2, brand.1)"
-              _hover={{
-                bgGradient: 'linear(to-r, red.500, yellow.500)',
-              }}
-              _focus={{
-                bgGradient: 'linear(to-r, brand.2, brand.1)',
-                bgClip: 'text',
-                border: '1px solid black',
-              }}
-              onClick={() => {
-                callback();
-              }}
-            >
-              Quit
-            </Button>
-            <Button
-              autoFocus={false}
-              as={motion.button}
-              alignItems="center"
-              color="white"
-              fontWeight="bold"
-              borderRadius="md"
-              w="40%"
-              bgGradient="linear(to-r, brand.2, brand.1)"
-              _hover={{
-                bgGradient: 'linear(to-r, red.500, yellow.500)',
-              }}
-              _focus={{
-                bgGradient: 'linear(to-r, brand.2, brand.1)',
-                bgClip: 'text',
-                border: '1px solid black',
-              }}
-              onClick={() => {
-                setModal(false);
-              }}
-            >
-              Cancel
-            </Button>
-          </Stack>
-        </ModalContent>
-      </Modal>
+            <ModalFooter>
+              <Text>Waiting for opponent...</Text>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+        <Modal isOpen={leave} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent alignItems={'center'}>
+            <ModalHeader>
+              <Flex>
+                <AnimatedHeading
+                  bgGradient="linear(to-r, red.500, yellow.500)"
+                  fontSize={['16px', '26px']}
+                  pr="5px"
+                >
+                  Are you sure you want to leave?
+                </AnimatedHeading>
+              </Flex>
+            </ModalHeader>
+            <ModalBody>🥺</ModalBody>
+            <ModalFooter>
+              <Text>
+                <Button
+                  colorScheme="blue"
+                  mr={3}
+                  onClick={() => {
+                    setScore(0);
+                    setMatch(false);
+                    leaveMatch();
+                    console.log('It is I, dio');
+                    navigate(-1);
+                  }}
+                >
+                  Yes
+                </Button>
+                <Button
+                  colorScheme="blue"
+                  mr={3}
+                  onClick={() => {
+                    setLeave(false);
+                  }}
+                >
+                  No
+                </Button>
+              </Text>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+        <Modal isOpen={finished} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent alignItems={'center'}>
+            <ModalHeader>
+              <Flex>
+                <AnimatedHeading
+                  bgGradient="linear(to-r, red.500, yellow.500)"
+                  fontSize={['16px', '26px']}
+                  pr="5px"
+                >
+                  Match has ended
+                </AnimatedHeading>
+              </Flex>
+            </ModalHeader>
+            <ModalBody>
+              <AnimatedHeading pb={4}>
+                Your Score: <CountUp start={0} end={score} />
+              </AnimatedHeading>
+              <AnimatedHeading pb={4}>
+                {opp.userName}'s Score: <CountUp start={0} end={oppScores} />
+              </AnimatedHeading>
+              <Text>
+                {oppScores > score ? opp.userName + ' wins 🙄' : 'You win!!😎'}
+              </Text>
+            </ModalBody>
+            <ModalFooter>
+              <Text>
+                <Button
+                  colorScheme="blue"
+                  mr={3}
+                  onClick={() => {
+                    setScore(0);
+                    setMatch(false);
+                    leaveMatch();
+                  }}
+                >
+                  Done
+                </Button>
+              </Text>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </>
     </>
   );
 };

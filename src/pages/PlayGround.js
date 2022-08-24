@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Stack,
   Link,
   Flex,
   Button,
-  Text,
+  useDisclosure,
   Modal,
   Spinner,
   ModalOverlay,
   ModalContent,
-  useDisclosure,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
 } from '@chakra-ui/react';
-import { motion } from 'framer-motion';
+// import { motion } from 'framer-motion';
 import SlideUp from '../components/Animations/SlideUp';
 import WelcomeDiv from '../components/Elements/WelcomeDiv';
 import Drop from '../components/Animations/Drop';
@@ -19,110 +21,126 @@ import AnimatedHeading from '../components/Elements/AnimatedHeading';
 import { BackButton } from '../components/Elements/BackButton';
 import FadeIn from '../components/Animations/FadeIn';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
-// import { useNavigate, Routes, Route } from 'react-router-dom';
 import OnlineCanvas from './OnlineCanvas';
 
 const PlayGround = () => {
+  const user = JSON.parse(localStorage.getItem('userName'));
   const HOST =
     process.env.NODE_ENV === 'development'
       ? 'ws://127.0.0.1:8000'
       : 'wss://hangman-websocket.herokuapp.com/';
-  const client = new W3CWebSocket(HOST);
-  const user = JSON.parse(localStorage.getItem('userName'));
+  const ws = useRef(null);
+  const [online, setOnline] = useState(false);
+  const [userId, setUserId] = useState();
   const [lobby, setLobby] = useState([]);
-  const [userId, setId] = useState();
-  const [opp, setOpp] = useState('');
-  const { onClose } = useDisclosure();
-  const [uSure, setSure] = useState(false);
-  const [yay, setYay] = useState(false);
+  const [opp, setOpp] = useState({ userName: '' });
+  const [message, setMessage] = useState();
+  const [game, setGame] = useState('');
   const [match, setMatch] = useState(false);
-  const [message, setMessage] = useState('');
-  const [gameId, setGame] = useState();
+  const [invitation, setInvitation] = useState(false);
+  const [rejected, setRejected] = useState(false);
   const [score, setScore] = useState(0);
+  const [questions, setquestion] = useState();
   const [oppScores, setOppscores] = useState(0);
-  const [line, setLine] = useState(false);
-  const [round, setRound] = useState(1);
+  const [line, setLine] = useState(0);
   const [quit, setQuit] = useState(false);
-  const [Answers, setAnswer] = useState();
-  // let navigate = useNavigate();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
-    client.onopen = () => {
-      console.log('Connecting to the server...');
+    ws.current = new W3CWebSocket(HOST);
+    ws.current.onopen = () => {
+      console.log('connecting to the server...');
     };
-    client.onmessage = message => {
+    ws.current.onmessage = message => {
       const results = JSON.parse(message.data);
       if (results.method === 'connect') {
-        setId(results.clientId);
+        console.log('connected');
+        setUserId(results.clientId);
+        setOnline(true);
         const payLoad = {
           method: 'connected',
-          clientId: userId,
           userName: user,
+          id: results.clientId,
         };
-        client.send(JSON.stringify(payLoad));
+        ws.current.send(JSON.stringify(payLoad));
       }
       if (results.method === 'online') {
-        console.log('successfully connected');
         setLobby(results.lobby);
       }
-      if (results.method === 'inviteGame') {
-        if (gameId) {
-          const payLoad = {
-            method: 'inaMatch',
-            clientId: userId,
-            clientName: user,
-          };
-          client.send(JSON.stringify(payLoad));
-        } else {
-          setSure(false);
-          setYay(true);
-          setOpp({ oppName: results.oppName, oppId: results.oppId });
-          setGame(results.gameId);
-          setAnswer(results.questions);
-        }
-      }
-      if (results.method === 'inv') {
-        console.log(results);
-        setOpp({ oppName: results.oppName, oppId: results.oppId });
+      if (results.method === 'invite') {
+        console.log(results.gameId);
         setGame(results.gameId);
-        setAnswer(results.questions);
+        onOpen();
+        setMessage(results.message);
+      }
+      if (results.method === 'invitation') {
+        console.log(results.gameId);
+        setGame(results.gameId);
+        setOpp({ id: results.oppId, userName: results.oppName });
+        onClose();
+        setInvitation(true);
       }
       if (results.method === 'lol') {
-        setSure(true);
-        setMessage('Your request was rejected. Loser😝');
-        setOpp('');
+        setRejected(true);
         setGame('');
-        console.log(results);
       }
-      if (results.method === 'accepted') {
-        setSure(false);
+      if (results.method === 'noice') {
+        onClose();
+        setquestion(results.questions.Ideas);
+        console.log('Match starting...');
         setMatch(true);
       }
-      if (results.method === 'play') {
-        setOppscores(results.oppScores);
+      if (results.method === 'round') {
+        if (results.oppName === user) {
+          setOppscores(results.score);
+        }
+        console.log(results);
         setLine(true);
       }
-      if (results.method === 'endMatch') {
-        setQuit(true);
+      if (results.method === 'wait') {
+        if (results.oppName === user) {
+          setOppscores(results.score);
+        }
+      }
+      if (results.method === 'quit') {
+        console.log(results);
         setOpp('');
+        setOppscores('');
         setGame('');
+        setMessage('');
+        setQuit(true);
       }
     };
-    return () => {};
-  });
-  const logOut = () => {
-    const payLoad = {
-      method: 'disconnected',
-      clientId: userId,
-      userName: user,
+    ws.current.onerror = err => {
+      console.log(err);
     };
-    client.send(JSON.stringify(payLoad));
-    console.log('Disconnected');
-    client.close();
-  };
+    ws.current.onclose = () => {
+      console.log('Disconnected from the server...');
+    };
+    return () => {
+      if (ws.current.readyState === 1) {
+        leaveMatch();
+        ws.current.close();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (ws.current.readyState !== 1) {
+      setOnline(false);
+    }
+  }, [ws]);
+  useEffect(() => {
+    if (rejected) {
+      setMessage(opp.userName + ' rejected your challenge');
+    }
+    if (game && !rejected) {
+      console.log('suck my pussay');
+    }
+  }, [rejected, game, opp]);
+
   const startGame = e => {
     const { value, name } = e.target;
-
     const payLoad = {
       method: 'createGame',
       clientId: userId,
@@ -130,182 +148,167 @@ const PlayGround = () => {
       oppId: value,
       oppName: name,
     };
-    client.send(JSON.stringify(payLoad));
+    ws.current.send(JSON.stringify(payLoad));
+    setOpp({ id: value, userName: name });
   };
   const acceptInvite = () => {
     const payLoad = {
       method: 'accepted',
       clientId: userId,
       clientName: user,
-      oppId: opp.oppId,
-      oppName: opp.oppName,
-      gameId: gameId,
+      oppId: opp.id,
+      oppName: opp.userName,
     };
-    client.send(JSON.stringify(payLoad));
+    ws.current.send(JSON.stringify(payLoad));
   };
   const rejectInvite = () => {
     const payLoad = {
       method: 'rejected',
       clientId: userId,
       clientName: user,
-      oppId: opp.oppId,
-      oppName: opp.oppName,
-      gameId: gameId,
+      oppId: opp.id,
+      oppName: opp.userName,
     };
-    client.send(JSON.stringify(payLoad));
-    console.log(payLoad);
+    ws.current.send(JSON.stringify(payLoad));
+    setOpp({ userName: '' });
   };
-
   const updateGameState = () => {
     const payLoad = {
       method: 'play',
       clientId: userId,
       clientName: user,
-      oppId: opp.oppId,
-      oppName: opp.oppName,
-      gameId: gameId,
+      oppId: opp.id,
+      oppName: opp.userName,
       score: score,
-      round: round,
+      gameId: game,
+      // level: level,
     };
-    client.send(JSON.stringify(payLoad));
-    setRound(round + 1);
+    ws.current.send(JSON.stringify(payLoad));
   };
-  const endMatch = () => {
+  const leaveMatch = () => {
     const payLoad = {
       method: 'endMatch',
       clientId: userId,
       clientName: user,
-      oppId: opp.oppId,
-      oppName: opp.oppName,
-      gameId: gameId,
+      oppId: opp.id,
+      oppName: opp.userName,
+      gameId: game,
     };
-    client.send(JSON.stringify(payLoad));
+    ws.current.send(JSON.stringify(payLoad));
+    setOpp('');
+    setOppscores('');
+    setGame('');
+    setMessage('');
   };
-  const callback = () => {
-    setMatch(false);
-    endMatch();
-  };
-  return !match ? (
+
+  return match ? (
     <>
-      <Modal
-        closeOnOverlayClick={false}
-        isOpen={uSure}
-        onClose={onClose}
-        motionPreset="slideInBottom"
-      >
-        <ModalOverlay
-          bg="blackAlpha.300"
-          backdropFilter="blur(2px) hue-rotate(-15deg)"
-        />
-        <ModalContent
-          bgColor="white"
-          as={motion.div}
-          drag
-          dragConstraints={{
-            top: -10,
-            left: -50,
-            right: 50,
-            bottom: 10,
-          }}
-        >
-          <Stack
-            p={2}
-            align="center"
-            bgColor="white"
-            color={'black'}
-            rounded="md"
-          >
-            <>
-              {message ? (
-                <Text fontWeight={'bold'} fontSize="20px">
-                  {message}
-                </Text>
-              ) : (
-                <AnimatedHeading pb={4}>
-                  Waiting for response...
-                </AnimatedHeading>
-              )}
-              {!message && <Spinner color="black" />}
-              <Button
-                alignItems="center"
-                color="white"
-                fontWeight="bold"
-                borderRadius="md"
-                w="40%"
-                bgGradient="linear(to-r, brand.2, brand.1)"
-                _hover={{
-                  bgGradient: 'linear(to-r, red.500, yellow.500)',
-                }}
-                _focus={{
-                  bgGradient: 'linear(to-r, brand.2, brand.1)',
-                  bgClip: 'text',
-                  border: '1px solid black',
-                }}
-                onClick={
-                  message
-                    ? () => {
-                        setSure(false);
-                        setMessage('');
-                        setGame('');
-                      }
-                    : () => {
-                        setSure(false);
-                      }
-                }
-              >
-                Cancel
-              </Button>
-            </>
-          </Stack>
+      <Modal isOpen={quit} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent alignItems={'center'}>
+          <ModalHeader>
+            <AnimatedHeading
+              bgGradient="linear(to-r, red.500, yellow.500)"
+              fontSize={['16px', '26px']}
+            >
+              Opponent quits the match
+            </AnimatedHeading>
+          </ModalHeader>
+          <ModalBody>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={() => {
+                setScore(0);
+                setQuit(false);
+                setMatch(false);
+              }}
+            >
+              Pussy😒
+            </Button>
+          </ModalBody>
         </ModalContent>
       </Modal>
+      <OnlineCanvas
+        match={match}
+        setMatch={setMatch}
+        leaveMatch={leaveMatch}
+        userId={userId}
+        opp={opp}
+        gameId={game}
+        updateGame={updateGameState}
+        score={score}
+        line={line}
+        setLine={setLine}
+        setScore={setScore}
+        oppScores={oppScores}
+        questions={questions}
+      />
+    </>
+  ) : (
+    <>
       <Drop p={['8', '20']} align="center">
-        <BackButton func={logOut} />
+        <BackButton />
       </Drop>
       <Stack align={'center'}>
         <WelcomeDiv>
           <AnimatedHeading>PlayGround</AnimatedHeading>
-        </WelcomeDiv>{' '}
+        </WelcomeDiv>
         <FadeIn>
           <AnimatedHeading
             bgGradient="linear(to-r, red.500, yellow.500)"
             fontSize={['16px', '26px']}
           >
-            Players Online:
+            Players online:
           </AnimatedHeading>
-        </FadeIn>{' '}
-        <Stack spacing={'10'} w={['80%', '40%']} pt={[10, 0]} overflow="hidden">
-          {lobby.map((player, index) => {
-            return (
-              <Flex
-                justify={'space-between'}
-                align="center"
-                key={index}
-                border="1px solid "
-                p={2}
-                rounded={'md'}
-              >
-                <AnimatedHeading
-                  bgGradient="linear(to-r, red.500, yellow.500)"
-                  fontSize={['16px', '26px']}
+        </FadeIn>
+        {online ? (
+          <Stack
+            spacing={'10'}
+            w={['80%', '40%']}
+            pt={[10, 0]}
+            overflow="hidden"
+          >
+            {lobby.map((player, index) => {
+              return (
+                <Flex
+                  justify={'space-between'}
+                  align="center"
+                  key={index}
+                  border="1px solid "
+                  p={2}
+                  rounded={'md'}
                 >
-                  {player.userName}
-                </AnimatedHeading>
-                <Button
-                  isDisabled={user === player.userName}
-                  name={player.userName}
-                  value={player.iD}
-                  onClick={e => {
-                    startGame(e);
-                    setSure(true);
-                  }}
-                >
-                  Join
-                </Button>
-              </Flex>
-            );
-          })}
-        </Stack>
+                  <AnimatedHeading
+                    bgGradient="linear(to-r, red.500, yellow.500)"
+                    fontSize={['16px', '26px']}
+                  >
+                    {player.userName}
+                  </AnimatedHeading>
+                  <Button
+                    isDisabled={user === player.userName}
+                    name={player.userName}
+                    value={player.id}
+                    onClick={e => {
+                      startGame(e);
+                    }}
+                  >
+                    Join
+                  </Button>
+                </Flex>
+              );
+            })}
+          </Stack>
+        ) : (
+          <>
+            <AnimatedHeading
+              bgGradient="linear(to-r, red.500, yellow.500)"
+              fontSize={['16px', '26px']}
+            >
+              You are offline, Try again later
+            </AnimatedHeading>
+          </>
+        )}
         <SlideUp align={'center'} py={'10%'} fontSize={['xs', 'sm']}>
           Made with ❤️ by {'\u00a0'}
           <Link href="https://twitter.com/AbdullahShehu1" target={'_blank'}>
@@ -313,154 +316,72 @@ const PlayGround = () => {
           </Link>
         </SlideUp>
       </Stack>
-      <Modal
-        closeOnOverlayClick={false}
-        isOpen={yay}
-        onClose={onClose}
-        motionPreset="slideInBottom"
-      >
-        <ModalOverlay
-          bg="blackAlpha.300"
-          backdropFilter="blur(2px) hue-rotate(-15deg)"
-        />
-        <ModalContent
-          bgColor="white"
-          as={motion.div}
-          drag
-          dragConstraints={{
-            top: -10,
-            left: -50,
-            right: 50,
-            bottom: 10,
-          }}
-        >
-          <Stack
-            p={2}
-            align="center"
-            bgColor="white"
-            rounded="md"
-            textAlign={'center'}
-          >
-            <AnimatedHeading pb={4}>
-              {opp.oppName} invites you to a match
-            </AnimatedHeading>
-            <Button
-              autoFocus={false}
-              alignItems="center"
-              color="white"
-              fontWeight="bold"
-              borderRadius="md"
-              w="40%"
-              bgGradient="linear(to-r, brand.2, brand.1)"
-              _hover={{
-                bgGradient: 'linear(to-r, red.500, yellow.500)',
-              }}
-              _focus={{
-                bgGradient: 'linear(to-r, brand.2, brand.1)',
-                bgClip: 'text',
-                border: '1px solid black',
-              }}
-              onClick={() => {
-                setYay(false);
-                acceptInvite();
-                setMatch(true);
-              }}
-            >
-              Accept
-            </Button>
-            <Button
-              color={'black'}
-              borderRadius="md"
-              w="40%"
-              border={'1px solid black'}
-              onClick={() => {
-                setYay(false);
-                rejectInvite();
-                setGame('');
-              }}
-              mb="8px"
-            >
-              Decline
-            </Button>
-          </Stack>
-        </ModalContent>
-      </Modal>
-    </>
-  ) : (
-    <>
-      <OnlineCanvas
-        callback={callback}
-        userId={userId}
-        opp={opp}
-        gameId={gameId}
-        updateGame={updateGameState}
-        score={score}
-        setScore={setScore}
-        oppScores={oppScores}
-        line={line}
-        setLine={setLine}
-        Answers={Answers}
-      />{' '}
-      <Modal
-        closeOnOverlayClick={false}
-        isOpen={quit}
-        onClose={onClose}
-        motionPreset="slideInBottom"
-      >
-        <ModalOverlay
-          bg="blackAlpha.300"
-          backdropFilter="blur(2px) hue-rotate(-15deg)"
-        />
-        <ModalContent
-          bgColor="white"
-          as={motion.div}
-          drag
-          dragConstraints={{
-            top: -10,
-            left: -50,
-            right: 50,
-            bottom: 10,
-          }}
-        >
-          <Stack
-            p={2}
-            align="center"
-            bgColor="white"
-            color={'black'}
-            rounded="md"
-          >
-            <>
-              <AnimatedHeading pb={4}>Opponent quit</AnimatedHeading>
+      <>
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent alignItems={'center'}>
+            <ModalHeader>
+              <AnimatedHeading
+                bgGradient="linear(to-r, red.500, yellow.500)"
+                fontSize={['16px', '26px']}
+              >
+                {message}
+              </AnimatedHeading>
+            </ModalHeader>
+            <ModalBody>{rejected ? '😝' : <Spinner />}</ModalBody>
+
+            <ModalFooter>
               <Button
-                alignItems="center"
-                color="white"
-                fontWeight="bold"
-                borderRadius="md"
-                w="40%"
-                bgGradient="linear(to-r, brand.2, brand.1)"
-                _hover={{
-                  bgGradient: 'linear(to-r, red.500, yellow.500)',
-                }}
-                _focus={{
-                  bgGradient: 'linear(to-r, brand.2, brand.1)',
-                  bgClip: 'text',
-                  border: '1px solid black',
-                }}
+                colorScheme="blue"
+                mr={3}
                 onClick={() => {
-                  setSure(false);
+                  onClose();
+                  setRejected(false);
                   setMessage('');
-                  setMatch(false);
-                  setQuit(false);
                 }}
               >
-                Back to Menu
+                Cancel
               </Button>
-            </>
-          </Stack>
-        </ModalContent>
-      </Modal>{' '}
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+        <Modal isOpen={invitation} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent alignItems={'center'}>
+            <ModalHeader>
+              <AnimatedHeading
+                bgGradient="linear(to-r, red.500, yellow.500)"
+                fontSize={['16px', '26px']}
+              >
+                {opp.userName} challenges you to a match
+              </AnimatedHeading>
+            </ModalHeader>
+            <ModalBody>
+              <Button
+                colorScheme="blue"
+                mr={3}
+                onClick={() => {
+                  setInvitation(false);
+                  acceptInvite();
+                }}
+              >
+                Accept
+              </Button>
+              <Button
+                colorScheme="blue"
+                mr={3}
+                onClick={() => {
+                  setInvitation(false);
+                  rejectInvite();
+                }}
+              >
+                Decline
+              </Button>{' '}
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      </>
     </>
   );
 };
-
 export default PlayGround;
