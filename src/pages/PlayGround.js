@@ -103,7 +103,6 @@ const PlayGround = () => {
         }
       }
       if (results.method === 'quit') {
-        console.log(results);
         setOpp('');
         setOppscores('');
         setGame('');
@@ -196,11 +195,19 @@ const PlayGround = () => {
     };
     ws.current.send(JSON.stringify(payLoad));
     setOpp('');
+    setScore(0);
     setOppscores('');
     setGame('');
     setMessage('');
   };
-
+  const endMatch = () => {
+    setScore(0);
+    setOpp('');
+    setOppscores('');
+    setGame('');
+    setMessage('');
+    setMatch(false);
+  };
   return match ? (
     <>
       <Modal isOpen={quit} onClose={onClose}>
@@ -211,7 +218,7 @@ const PlayGround = () => {
               bgGradient="linear(to-r, red.500, yellow.500)"
               fontSize={['16px', '26px']}
             >
-              Opponent quits the match
+              Opponent left the match
             </AnimatedHeading>
           </ModalHeader>
           <ModalBody>
@@ -224,12 +231,13 @@ const PlayGround = () => {
                 setMatch(false);
               }}
             >
-              Pussy😒
+              Pussy 😒
             </Button>
           </ModalBody>
         </ModalContent>
       </Modal>
       <OnlineCanvas
+        endMatch={endMatch}
         match={match}
         setMatch={setMatch}
         leaveMatch={leaveMatch}

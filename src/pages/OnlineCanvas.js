@@ -29,6 +29,7 @@ import { useNavigate } from 'react-router-dom';
 
 const OnlineCanvas = ({
   leaveMatch,
+  endMatch,
   opp,
   score,
   oppScores,
@@ -347,9 +348,12 @@ const OnlineCanvas = ({
               <AnimatedHeading pb={4}>
                 {opp.userName}'s Score: <CountUp start={0} end={oppScores} />
               </AnimatedHeading>
-              <Text>
-                {oppScores > score ? opp.userName + ' wins 🙄' : 'You win!!😎'}
-              </Text>
+              <Flex textAlign={'center'}>
+                <AnimatedHeading pb={4}>
+                  {oppScores > score ? opp.userName + ' wins' : 'You win!!'}
+                </AnimatedHeading>
+                {oppScores > score ? opp.userName + '  🙄' : '  😎'}
+              </Flex>
             </ModalBody>
             <ModalFooter>
               <Text>
@@ -357,9 +361,7 @@ const OnlineCanvas = ({
                   colorScheme="blue"
                   mr={3}
                   onClick={() => {
-                    setScore(0);
-                    setMatch(false);
-                    leaveMatch();
+                    endMatch();
                   }}
                 >
                   Done
