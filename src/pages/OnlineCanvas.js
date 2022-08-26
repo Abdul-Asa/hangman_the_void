@@ -43,7 +43,7 @@ const OnlineCanvas = ({
   const Answers = React.useMemo(() => {
     return questions;
   }, []);
-  const [level, setLevel] = useState(4);
+  const [level, setLevel] = useState(0);
   const [current, setCurrent] = useState(Answers[level]);
   const [complete, setComplete] = useState(false);
   const [correct, setCorrect] = useState(
