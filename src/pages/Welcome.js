@@ -1,5 +1,6 @@
 import React from 'react';
-import { Center, Stack, Flex } from '@chakra-ui/react';
+import { Center, Stack, Flex, useColorModeValue, Link } from '@chakra-ui/react';
+import SlideUp from '../components/Animations/SlideUp';
 // import useSound from 'use-sound';
 // import Xboxsfx from '../components/Sounds/Xbox.mp3';
 // import Clicksfx from '../components/Sounds/Click.mp3';

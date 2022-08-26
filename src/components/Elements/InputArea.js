@@ -1,11 +1,17 @@
 import React from 'react';
-import { Input, HStack, Box, useMediaQuery, Container } from '@chakra-ui/react';
+import {
+  Input,
+  HStack,
+  Box,
+  useMediaQuery,
+  Container,
+  InputGroup,
+} from '@chakra-ui/react';
 
-export const InputArea = ({ current, correct, ...props }) => {
+export const InputArea = ({ current, correct, handleKeyPress, ...props }) => {
   const [isDesktop] = useMediaQuery('(min-width: 50em)');
-
   return isDesktop ? (
-    <HStack spacing="4">
+    <InputGroup as={HStack} spacing="4" onKeyDown={handleKeyPress}>
       {current.word.split('').map((letter, index) => {
         return letter === ' ' ? (
           <Box key={index} w={['4px', '2ch']} />
@@ -28,7 +34,7 @@ export const InputArea = ({ current, correct, ...props }) => {
           />
         );
       })}
-    </HStack>
+    </InputGroup>
   ) : (
     <Container>
       {current.word.split('').map((letter, index) => {
@@ -36,6 +42,7 @@ export const InputArea = ({ current, correct, ...props }) => {
           <Box key={index} w={['4px', '2ch']} />
         ) : (
           <Input
+            autoFocus={index === 0}
             key={index}
             ml={'4px'}
             isReadOnly

@@ -24,6 +24,8 @@ import { Ideas } from '../components/Elements/Answers';
 import { TypeStage } from '../components/Elements/TypeArea';
 import { InputArea } from '../components/Elements/InputArea';
 import CountUp from 'react-countup';
+import useSound from 'use-sound';
+import augh from '../components/Sounds/augh.mp3';
 function shuffle(array) {
   let currentIndex = array.length,
     randomIndex;
@@ -45,6 +47,20 @@ function shuffle(array) {
 }
 
 const Canvas = () => {
+  const [playbackRate, setPlaybackRate] = useState(0.75);
+  const [jokes] = useSound(augh, {
+    sprite: { 1: [300, 1700] },
+    playbackRate,
+    volume: 0.5,
+  });
+  const handleClick = () => {
+    if (playbackRate >= 3) {
+      setPlaybackRate(0.75);
+    } else {
+      setPlaybackRate(playbackRate + 0.3);
+      jokes({ id: '1' });
+    }
+  };
   const Answers = React.useMemo(() => {
     return shuffle(Ideas);
   }, []);
@@ -99,6 +115,55 @@ const Canvas = () => {
 
   const check = e => {
     const { value } = e.target;
+    for (let x = 0; x < current.word.length; x++) {
+      if (current.word[x] === ' ') {
+        setCorrect(inp => {
+          return [
+            ...inp.slice(0, x),
+            true,
+            ...inp.slice(x + 1, current.word.length),
+          ];
+        });
+      }
+    }
+
+    for (let x = 0; x < current.word.length; x++) {
+      if (value === current.word[x]) {
+        if (!correct[x] === true) {
+          setScore(score + 100);
+        }
+      }
+    }
+
+    if (current.word.includes(value)) {
+      setConfam('Correct ✅');
+      for (let x = 0; x < current.word.length; x++) {
+        if (value === current.word[x]) {
+          setCorrect(inp => {
+            return [
+              ...inp.slice(0, x),
+              true,
+              ...inp.slice(x + 1, current.word.length),
+            ];
+          });
+        }
+      }
+    } else {
+      if (level === 0 && score <= 80) {
+        setScore(0);
+      } else {
+        setScore(score - 80);
+      }
+      setConfam('Wrong ❌');
+    }
+    if (!correct.includes(false)) {
+      setComplete(true);
+    }
+  };
+  const handleKeypress = e => {
+    console.log(e.code);
+    const value = e.code.slice(-1);
+
     for (let x = 0; x < current.word.length; x++) {
       if (current.word[x] === ' ') {
         setCorrect(inp => {
@@ -293,6 +358,7 @@ const Canvas = () => {
               current={current}
               correct={correct}
               borderColor={useColorModeValue('brand.3', 'brand.4')}
+              handleKeyPress={handleKeypress}
             />
           </FadeIn>
           <SlideUp>
@@ -319,13 +385,14 @@ const Canvas = () => {
           <SlideUp
             align={'center'}
             color={useColorModeValue('brand.3', 'brand.4')}
-            pt={[20, 32]}
+            pt={[20, 40]}
             fontSize={['xs', 'sm']}
           >
-            Made with ❤️ by {'\u00a0'}
+            Made with {'\u00a0'} <span onClick={handleClick}> ❤️ </span>
+            {'\u00a0'} by {'\u00a0'}
             <Link href="https://twitter.com/AbdullahShehu1" target={'_blank'}>
               Shehu
-            </Link>
+            </Link>{' '}
           </SlideUp>
         </Stack>
       </Center>

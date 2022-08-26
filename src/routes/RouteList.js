@@ -25,10 +25,14 @@ const RoutesJs = () => {
         path="/entry/*"
         element={<NameInput sound={first} />}
       ></Route>
-      <Route exact path="/home/*" element={<Home />}></Route>
+      <Route exact path="/home/*" element={<Home sound={first} />}></Route>
       <Route exact path="/canvas/*" element={<Canvas />}></Route>
       <Route exact path="/playground/" element={<PlayGround />}></Route>
-      <Route exact path="/options/*" element={<Help />}></Route>
+      <Route
+        exact
+        path="/options/*"
+        element={<Help sound={first} callback={callback} />}
+      ></Route>
       <Route exact path="/hi-scores/*" element={<HighScore />}></Route>
     </Routes>
   );

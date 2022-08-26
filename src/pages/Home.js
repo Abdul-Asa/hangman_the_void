@@ -16,9 +16,12 @@ import Suspension from '../components/Elements/Suspension';
 import FadeIn from '../components/Animations/FadeIn';
 import AnimatedHeading from '../components/Elements/AnimatedHeading';
 import SlideUp from '../components/Animations/SlideUp';
-// import useSound from 'use-sound';
+import useSound from 'use-sound';
+import wii from '../components/Sounds/wii.mp3';
 // import audio from '../components/Sounds/audio.mp3';
-function Home() {
+import augh from '../components/Sounds/augh.mp3';
+
+function Home({ sound }) {
   const user = JSON.parse(localStorage.getItem('userName'));
   const highScores = JSON.parse(localStorage.getItem('highScores'));
   const [hours, setHours] = useState(new Date().getHours());
@@ -26,12 +29,27 @@ function Home() {
   var counter = 0;
   const navigate = useNavigate();
 
-  // const [playing, setPlaying] = useState(false);
-
-  // const [play, { stop, sound }] = useSound(audio, {
-  //   volume: '0.3',
-  //   loop: true,
-  // });
+  // const [rand] = useState(Math.floor(Math.random() * 2) + 1);
+  const [playing, setPlaying] = useState(false);
+  const [play, { stop }] = useSound(wii, {
+    volume: 0.1,
+    loop: true,
+    soundEnabled: sound,
+  });
+  const [playbackRate, setPlaybackRate] = useState(0.75);
+  const [jokes] = useSound(augh, {
+    sprite: { 1: [300, 1700] },
+    playbackRate,
+    volume: 0.5,
+  });
+  const handleClick = () => {
+    if (playbackRate >= 3) {
+      setPlaybackRate(0.75);
+    } else {
+      setPlaybackRate(playbackRate + 0.3);
+      jokes({ id: '1' });
+    }
+  };
 
   if (!user) {
     navigate('/');
@@ -39,6 +57,22 @@ function Home() {
   if (!highScores) {
     navigate('/');
   }
+
+  // const toggle = () => setPlaying(!playing);
+
+  useEffect(() => {
+    // setTimeout(() => {
+    if (playing) {
+      play();
+      console.log('play that shit');
+    }
+    // }, 2000);
+
+    return () => {
+      stop();
+      console.log('stop that shit');
+    };
+  }, [playing]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -53,8 +87,8 @@ function Home() {
   return (
     <>
       <Drop px={['8', '20']} pt={['8', '20']} pb={'8'} align="center">
-        <BackButton type="home" sound />
-        <Flex>
+        <BackButton type="home" windows sound={sound} />
+        <Flex onMouseEnter={() => setPlaying(true)}>
           <AnimatedHeading> {hours < 10 ? `0${hours}` : hours}</AnimatedHeading>
           <Box className="blink">
             <Heading
@@ -70,7 +104,7 @@ function Home() {
           </AnimatedHeading>
         </Flex>
       </Drop>
-      <Center>
+      <Center onMouseEnter={() => setPlaying(true)}>
         <Stack align={'center'}>
           <Flex align={'center'} direction={['column', 'column', 'row']}>
             <FadeIn>
@@ -89,7 +123,8 @@ function Home() {
             pt={[20, 40]}
             fontSize={['xs', 'sm']}
           >
-            Made with ❤️ by {'\u00a0'}
+            Made with {'\u00a0'} <span onClick={handleClick}> ❤️ </span>
+            {'\u00a0'} by {'\u00a0'}
             <Link href="https://twitter.com/AbdullahShehu1" target={'_blank'}>
               Shehu
             </Link>{' '}

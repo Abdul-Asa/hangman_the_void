@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Stack,
   Link,
@@ -12,16 +12,25 @@ import { motion } from 'framer-motion';
 import Drop from '../components/Animations/Drop';
 import AnimatedHeading from '../components/Elements/AnimatedHeading';
 import { BackButton } from '../components/Elements/BackButton';
+import useSound from 'use-sound';
+import augh from '../components/Sounds/augh.mp3';
 
 const HighScore = () => {
   const hiScores = JSON.parse(localStorage.getItem('highScores'));
-  // const icons = {
-  //   1: <RiNumber1 />,
-  //   2: <RiNumber2 />,
-  //   3: <RiNumber3 />,
-  //   4: <RiNumber4 />,
-  //   5: <RiNumber5 />,
-  // };
+  const [playbackRate, setPlaybackRate] = useState(0.75);
+  const [jokes] = useSound(augh, {
+    sprite: { 1: [300, 1700] },
+    playbackRate,
+    volume: 0.5,
+  });
+  const handleClick = () => {
+    if (playbackRate >= 3) {
+      setPlaybackRate(0.75);
+    } else {
+      setPlaybackRate(playbackRate + 0.3);
+      jokes({ id: '1' });
+    }
+  };
   return (
     <>
       <Drop p={['8', '20']} align="center">
@@ -60,13 +69,14 @@ const HighScore = () => {
         <SlideUp
           align={'center'}
           color={useColorModeValue('brand.3', 'brand.4')}
-          pt={[250, 180]}
+          pt={[20, 40]}
           fontSize={['xs', 'sm']}
         >
-          Made with ❤️ by {'\u00a0'}
+          Made with {'\u00a0'} <span onClick={handleClick}> ❤️ </span>
+          {'\u00a0'} by {'\u00a0'}
           <Link href="https://twitter.com/AbdullahShehu1" target={'_blank'}>
             Shehu
-          </Link>
+          </Link>{' '}
         </SlideUp>
       </Stack>
     </>

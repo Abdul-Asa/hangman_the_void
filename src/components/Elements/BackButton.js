@@ -5,12 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import useSound from 'use-sound';
 import bye from '../Sounds/Xp.mp3';
 
-export const BackButton = ({ sound, func, ...props }) => {
+export const BackButton = ({ sound, func, windows, ...props }) => {
   // const sound = JSON.parse(localStorage.getItem('sound'));
 
   let navigate = useNavigate();
   const [play] = useSound(bye, {
-    seek: 800,
+    seek: 1000,
     interrupt: true,
     soundEnabled: sound,
   });
@@ -40,13 +40,13 @@ export const BackButton = ({ sound, func, ...props }) => {
             }
           : props.type
           ? () => {
-              if (props.sound) {
+              if (windows) {
                 play();
               }
               navigate('/');
             }
           : () => {
-              if (props.sound) {
+              if (windows) {
                 play();
               }
               navigate(-1);

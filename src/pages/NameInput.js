@@ -52,7 +52,7 @@ const NameInput = ({ sound }) => {
   return (
     <>
       <Drop p={['8', '20']}>
-        <BackButton sound={sound} />
+        <BackButton sound={sound} windows />
       </Drop>
       <Center p={'8'} alignItems="center">
         <Stack align={'center'}>
