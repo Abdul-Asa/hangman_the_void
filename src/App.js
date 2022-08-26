@@ -9,7 +9,7 @@ import { AnimatePresence } from 'framer-motion';
 // import audio from './components/Sounds/audio.mp3';
 
 function App() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   // const [sound, setSound] = useState(true);
   useEffect(() => {
     setTimeout(() => {
