@@ -43,7 +43,7 @@ const OnlineCanvas = ({
   const Answers = React.useMemo(() => {
     return questions;
   }, []);
-  const [level, setLevel] = useState(0);
+  const [level, setLevel] = useState(4);
   const [current, setCurrent] = useState(Answers[level]);
   const [complete, setComplete] = useState(false);
   const [correct, setCorrect] = useState(
@@ -225,7 +225,6 @@ const OnlineCanvas = ({
             color={useColorModeValue('brand.3', 'brand.4')}
             pb={4}
             fontSize={['sm', 'medium']}
-            onClick={nextLevel}
           >
             {start ? 'Hint: ' + current.hint : '   starting in: ' + count}
           </Text>
@@ -341,18 +340,19 @@ const OnlineCanvas = ({
                 </AnimatedHeading>
               </Flex>
             </ModalHeader>
-            <ModalBody>
+            <ModalBody textAlign={'center'}>
               <AnimatedHeading pb={4}>
                 Your Score: <CountUp start={0} end={score} />
               </AnimatedHeading>
               <AnimatedHeading pb={4}>
                 {opp.userName}'s Score: <CountUp start={0} end={oppScores} />
               </AnimatedHeading>
-              <Flex textAlign={'center'}>
-                <AnimatedHeading pb={4}>
+              <Flex align={'center'} justify="center">
+                <AnimatedHeading pb={4} textAlign={'center'}>
                   {oppScores > score ? opp.userName + ' wins' : 'You win!!'}
                 </AnimatedHeading>
-                {oppScores > score ? opp.userName + '  🙄' : '  😎'}
+                {'\u00a0'}
+                {oppScores > score ? '  🙄' : '  😎'}
               </Flex>
             </ModalBody>
             <ModalFooter>
@@ -362,6 +362,7 @@ const OnlineCanvas = ({
                   mr={3}
                   onClick={() => {
                     endMatch();
+                    setFinished(false);
                   }}
                 >
                   Done

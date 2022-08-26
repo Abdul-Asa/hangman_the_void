@@ -109,6 +109,13 @@ const PlayGround = () => {
         setMessage('');
         setQuit(true);
       }
+      if (results.method === 'end') {
+        setOpp('');
+        setScore(0);
+        setOppscores(0);
+        setGame('');
+        setMessage('');
+      }
     };
     ws.current.onerror = err => {
       console.log(err);
@@ -186,6 +193,17 @@ const PlayGround = () => {
   };
   const leaveMatch = () => {
     const payLoad = {
+      method: 'quitMatch',
+      clientId: userId,
+      clientName: user,
+      oppId: opp.id,
+      oppName: opp.userName,
+      gameId: game,
+    };
+    ws.current.send(JSON.stringify(payLoad));
+  };
+  const endMatch = () => {
+    const payLoad = {
       method: 'endMatch',
       clientId: userId,
       clientName: user,
@@ -194,13 +212,6 @@ const PlayGround = () => {
       gameId: game,
     };
     ws.current.send(JSON.stringify(payLoad));
-    setOpp('');
-    setScore(0);
-    setOppscores('');
-    setGame('');
-    setMessage('');
-  };
-  const endMatch = () => {
     setScore(0);
     setOpp('');
     setOppscores('');
