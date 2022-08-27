@@ -86,7 +86,8 @@ const PlayGround = () => {
       }
       if (results.method === 'noice') {
         onClose();
-        setquestion(results.questions.Ideas);
+        console.log(results.questions);
+        setquestion(results.questions);
         console.log('Match starting...');
         setMatch(true);
       }
@@ -242,7 +243,7 @@ const PlayGround = () => {
                 setMatch(false);
               }}
             >
-              Pussy 😒
+              Scaredy Cat 😒
             </Button>
           </ModalBody>
         </ModalContent>
