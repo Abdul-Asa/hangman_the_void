@@ -8,7 +8,7 @@ export default function SlidingWords() {
   const [replay, setReplay] = useState(true);
   // Placeholder text data, as if from API
   const placeholderText = [
-    { type: 'heading1', text: 'It is easy to write code,' },
+    { type: 'heading1', text: 'It is simple to write code,' },
     {
       type: 'heading1',
       text: 'but it is hard to write simple code',
