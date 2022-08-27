@@ -15,7 +15,7 @@ const HelpText = ({ ...props }) => {
       px="2"
       {...props}
     >
-      Drag down to change
+      {props.children}
     </Text>
   );
 };

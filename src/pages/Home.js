@@ -18,9 +18,9 @@ import AnimatedHeading from '../components/Elements/AnimatedHeading';
 import SlideUp from '../components/Animations/SlideUp';
 import useSound from 'use-sound';
 import wii from '../components/Sounds/wii.mp3';
-// import audio from '../components/Sounds/audio.mp3';
-import augh from '../components/Sounds/augh.mp3';
+import HelpText from '../components/Elements/HelpText';
 
+import augh from '../components/Sounds/augh.mp3';
 function Home({ sound }) {
   const user = JSON.parse(localStorage.getItem('userName'));
   const highScores = JSON.parse(localStorage.getItem('highScores'));
@@ -28,8 +28,7 @@ function Home({ sound }) {
   const [minutes, setMinutes] = useState(new Date().getMinutes());
   var counter = 0;
   const navigate = useNavigate();
-
-  // const [rand] = useState(Math.floor(Math.random() * 2) + 1);
+  const [show, setShowing] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [play, { stop }] = useSound(wii, {
     volume: 0.1,
@@ -72,7 +71,7 @@ function Home({ sound }) {
       stop();
       console.log('stop that shit');
     };
-  }, [playing]);
+  }, [playing, play, stop]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -83,6 +82,14 @@ function Home({ sound }) {
     setHours(new Date().getHours());
     return () => clearInterval(timer);
   }, [minutes, hours, counter]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (show) {
+        setShowing(false);
+      }
+    }, 5000);
+  }, [show]);
 
   return (
     <>
@@ -129,6 +136,7 @@ function Home({ sound }) {
               Shehu
             </Link>{' '}
           </SlideUp>
+          {show && <HelpText>Click on the heart for a surprise</HelpText>}
         </Stack>
       </Center>
     </>
