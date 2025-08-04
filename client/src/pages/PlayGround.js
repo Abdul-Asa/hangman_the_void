@@ -28,9 +28,11 @@ const PlayGround = () => {
   const HOST =
     process.env.NODE_ENV === 'development'
       ? 'ws://127.0.0.1:8000'
-      : 'wss://hangman-websocket.herokuapp.com/';
+      : 'wss://hangman-the-void.onrender.com/';
   const ws = useRef(null);
   const [online, setOnline] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(true);
+  const [connectionError, setConnectionError] = useState(false);
   const [userId, setUserId] = useState();
   const [lobby, setLobby] = useState([]);
   const [opp, setOpp] = useState({ userName: '' });
@@ -46,11 +48,18 @@ const PlayGround = () => {
   const [quit, setQuit] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  useEffect(() => {
+  const connectWebSocket = () => {
+    setIsConnecting(true);
+    setConnectionError(false);
+
     ws.current = new W3CWebSocket(HOST);
+
     ws.current.onopen = () => {
       console.log('connecting to the server...');
+      setIsConnecting(false);
+      setConnectionError(false);
     };
+
     ws.current.onmessage = message => {
       const results = JSON.parse(message.data);
       if (results.method === 'connect') {
@@ -118,14 +127,32 @@ const PlayGround = () => {
         setMessage('');
       }
     };
+
     ws.current.onerror = err => {
       console.log(err);
+      setConnectionError(true);
+      setIsConnecting(false);
     };
+
     ws.current.onclose = () => {
       console.log('Disconnected from the server...');
+      setOnline(false);
+      setIsConnecting(true);
+
+      // Attempt to reconnect after 3 seconds
+      setTimeout(() => {
+        if (ws.current?.readyState === WebSocket.CLOSED) {
+          connectWebSocket();
+        }
+      }, 3000);
     };
+  };
+
+  useEffect(() => {
+    connectWebSocket();
+
     return () => {
-      if (ws.current.readyState === 1) {
+      if (ws.current?.readyState === WebSocket.OPEN) {
         leaveMatch();
         ws.current.close();
       }
@@ -282,7 +309,32 @@ const PlayGround = () => {
             Players online:
           </AnimatedHeading>
         </FadeIn>
-        {online ? (
+        {isConnecting ? (
+          <Stack align="center" spacing={4}>
+            <Spinner size="xl" />
+            <AnimatedHeading
+              bgGradient="linear(to-r, blue.500, teal.500)"
+              fontSize={['16px', '26px']}
+            >
+              Connecting to server...
+            </AnimatedHeading>
+            <AnimatedHeading
+              bgGradient="linear(to-r, gray.500, gray.700)"
+              fontSize={['12px', '16px']}
+            >
+              This may take a few seconds if the server is spinning up
+            </AnimatedHeading>
+          </Stack>
+        ) : connectionError ? (
+          <Stack align="center" spacing={4}>
+            <AnimatedHeading
+              bgGradient="linear(to-r, red.500, orange.500)"
+              fontSize={['16px', '26px']}
+            >
+              Connection error. Retrying...
+            </AnimatedHeading>
+          </Stack>
+        ) : online ? (
           <Stack
             spacing={'10'}
             w={['80%', '40%']}
