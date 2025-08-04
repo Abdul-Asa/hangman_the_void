@@ -9,7 +9,7 @@ import PlayGround from '../pages/PlayGround';
 import Help from '../pages/Help';
 
 const RoutesJs = () => {
-  const [first, setfirst] = useState(true);
+  const [first, setfirst] = useState(false);
   const callback = () => {
     return setfirst(!first);
   };
